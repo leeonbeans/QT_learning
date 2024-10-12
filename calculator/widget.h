@@ -17,6 +17,15 @@ public:
     Widget(QWidget *parent = nullptr);
     ~Widget();
 
+    QString
+
+private slots:
+    void btnNumClicked();
+
+    void on_btnDecimal_clicked();
+
+    void on_btnBackSpace_clicked();
+
 private:
     Ui::Widget *ui;
 };
