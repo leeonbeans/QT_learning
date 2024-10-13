@@ -19,6 +19,9 @@
   <property name="windowTitle">
    <string>Widget</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: silver;</string>
+  </property>
   <layout class="QGridLayout" name="gridLayout_3">
    <property name="leftMargin">
     <number>1</number>
@@ -45,6 +48,20 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton{
+	background: rgb(75, 108, 183);
+	color: black;
+}
+QPushButton:hover {
+	background: rgb(62, 90, 150);
+	color: black;
+}
+QPushButton:pressed {
+	background: rgb(75, 108, 183);
+	color: black;
+}</string>
+       </property>
        <property name="text">
         <string>3</string>
        </property>
@@ -57,6 +74,20 @@
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton{
+	background: rgb(24, 40, 72);
+	color: white;
+}
+QPushButton:hover{
+	background: rgb(34, 57, 102);
+	color: white;
+}
+QPushButton:pressed{
+	background: rgb(24, 40, 72);
+	color: white;
+}</string>
        </property>
        <property name="text">
         <string>+</string>
@@ -76,6 +107,20 @@
          <pointsize>11</pointsize>
         </font>
        </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton{
+	background: rgb(24, 40, 72);
+	color: white;
+}
+QPushButton:hover{
+	background: rgb(34, 57, 102);
+	color: white;
+}
+QPushButton:pressed{
+	background: rgb(24, 40, 72);
+	color: white;
+}</string>
+       </property>
        <property name="text">
         <string>÷</string>
        </property>
@@ -88,6 +133,20 @@
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton{
+	background: rgb(75, 108, 183);
+	color: black;
+}
+QPushButton:hover {
+	background: rgb(62, 90, 150);
+	color: black;
+}
+QPushButton:pressed {
+	background: rgb(75, 108, 183);
+	color: black;
+}</string>
        </property>
        <property name="text">
         <string>5</string>
@@ -102,6 +161,20 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton{
+	background: rgb(75, 108, 183);
+	color: black;
+}
+QPushButton:hover {
+	background: rgb(62, 90, 150);
+	color: black;
+}
+QPushButton:pressed {
+	background: rgb(75, 108, 183);
+	color: black;
+}</string>
+       </property>
        <property name="text">
         <string>8</string>
        </property>
@@ -114,6 +187,20 @@
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton{
+	background: rgb(24, 40, 72);
+	color: white;
+}
+QPushButton:hover{
+	background: rgb(34, 57, 102);
+	color: white;
+}
+QPushButton:pressed{
+	background: rgb(24, 40, 72);
+	color: white;
+}</string>
        </property>
        <property name="text">
         <string>²√ </string>
@@ -128,6 +215,20 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton{
+	background: rgb(75, 108, 183);
+	color: black;
+}
+QPushButton:hover {
+	background: rgb(62, 90, 150);
+	color: black;
+}
+QPushButton:pressed {
+	background: rgb(75, 108, 183);
+	color: black;
+}</string>
+       </property>
        <property name="text">
         <string>2</string>
        </property>
@@ -140,6 +241,20 @@
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton{
+	background: rgb(75, 108, 183);
+	color: black;
+}
+QPushButton:hover {
+	background: rgb(62, 90, 150);
+	color: black;
+}
+QPushButton:pressed {
+	background: rgb(75, 108, 183);
+	color: black;
+}</string>
        </property>
        <property name="text">
         <string>7</string>
@@ -154,6 +269,20 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton{
+	background: rgb(75, 108, 183);
+	color: black;
+}
+QPushButton:hover {
+	background: rgb(62, 90, 150);
+	color: black;
+}
+QPushButton:pressed {
+	background: rgb(75, 108, 183);
+	color: black;
+}</string>
+       </property>
        <property name="text">
         <string>9</string>
        </property>
@@ -167,6 +296,20 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton{
+	background: rgb(75, 108, 183);
+	color: black;
+}
+QPushButton:hover {
+	background: rgb(62, 90, 150);
+	color: black;
+}
+QPushButton:pressed {
+	background: rgb(75, 108, 183);
+	color: black;
+}</string>
+       </property>
        <property name="text">
         <string>4</string>
        </property>
@@ -179,6 +322,20 @@
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton{
+	background: rgb(75, 108, 183);
+	color: black;
+}
+QPushButton:hover {
+	background: rgb(62, 90, 150);
+	color: black;
+}
+QPushButton:pressed {
+	background: rgb(75, 108, 183);
+	color: black;
+}</string>
        </property>
        <property name="text">
         <string>1</string>
@@ -198,6 +355,20 @@
          <pointsize>10</pointsize>
         </font>
        </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton{
+	background: rgb(24, 40, 72);
+	color: white;
+}
+QPushButton:hover{
+	background: rgb(34, 57, 102);
+	color: white;
+}
+QPushButton:pressed{
+	background: rgb(24, 40, 72);
+	color: white;
+}</string>
+       </property>
        <property name="text">
         <string> x²</string>
        </property>
@@ -211,10 +382,20 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <property name="minimumSize">
+        <size>
+         <width>354</width>
+         <height>53</height>
+        </size>
+       </property>
        <property name="font">
         <font>
-         <pointsize>20</pointsize>
+         <pointsize>25</pointsize>
         </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: #444444;
+color: rgb(255, 255, 255);</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
@@ -232,6 +413,20 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton{
+	background: rgb(75, 108, 183);
+	color: black;
+}
+QPushButton:hover {
+	background: rgb(62, 90, 150);
+	color: black;
+}
+QPushButton:pressed {
+	background: rgb(75, 108, 183);
+	color: black;
+}</string>
+       </property>
        <property name="text">
         <string>⁺/-</string>
        </property>
@@ -244,6 +439,20 @@
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton{
+	background: rgb(24, 40, 72);
+	color: white;
+}
+QPushButton:hover{
+	background: rgb(34, 57, 102);
+	color: white;
+}
+QPushButton:pressed{
+	background: rgb(24, 40, 72);
+	color: white;
+}</string>
        </property>
        <property name="text">
         <string>%</string>
@@ -263,6 +472,20 @@
          <pointsize>15</pointsize>
         </font>
        </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton{
+	background: rgb(24, 40, 72);
+	color: white;
+}
+QPushButton:hover{
+	background: rgb(34, 57, 102);
+	color: white;
+}
+QPushButton:pressed{
+	background: rgb(24, 40, 72);
+	color: white;
+}</string>
+       </property>
        <property name="text">
         <string>-</string>
        </property>
@@ -276,6 +499,20 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton{
+	background: rgb(75, 108, 183);
+	color: black;
+}
+QPushButton:hover {
+	background: rgb(62, 90, 150);
+	color: black;
+}
+QPushButton:pressed {
+	background: rgb(75, 108, 183);
+	color: black;
+}</string>
+       </property>
        <property name="text">
         <string>.</string>
        </property>
@@ -288,6 +525,20 @@
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton{
+	background: rgb(24, 40, 72);
+	color: white;
+}
+QPushButton:hover{
+	background: rgb(34, 57, 102);
+	color: white;
+}
+QPushButton:pressed{
+	background: rgb(24, 40, 72);
+	color: white;
+}</string>
        </property>
        <property name="text">
         <string>CE</string>
@@ -307,6 +558,20 @@
          <pointsize>11</pointsize>
         </font>
        </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton{
+	background: rgb(24, 40, 72);
+	color: white;
+}
+QPushButton:hover{
+	background: rgb(34, 57, 102);
+	color: white;
+}
+QPushButton:pressed{
+	background: rgb(24, 40, 72);
+	color: white;
+}</string>
+       </property>
        <property name="text">
         <string>×</string>
        </property>
@@ -319,6 +584,20 @@
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton{
+	background: rgb(75, 108, 183);
+	color: black;
+}
+QPushButton:hover {
+	background: rgb(62, 90, 150);
+	color: black;
+}
+QPushButton:pressed {
+	background: rgb(75, 108, 183);
+	color: black;
+}</string>
        </property>
        <property name="text">
         <string>0</string>
@@ -338,6 +617,21 @@
          <pointsize>12</pointsize>
         </font>
        </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton{
+	background: rgb(225, 150, 0);
+	color: white;
+}
+QPushButton:hover{
+	background: rgb(186, 124, 0);
+	color: white;
+}
+QPushButton:pressed{
+	background: rgb(225, 150, 0);
+	color: white;
+}
+</string>
+       </property>
        <property name="text">
         <string>=</string>
        </property>
@@ -356,6 +650,20 @@
          <pointsize>9</pointsize>
         </font>
        </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton{
+	background: rgb(24, 40, 72);
+	color: white;
+}
+QPushButton:hover{
+	background: rgb(34, 57, 102);
+	color: white;
+}
+QPushButton:pressed{
+	background: rgb(24, 40, 72);
+	color: white;
+}</string>
+       </property>
        <property name="text">
         <string>¹/x</string>
        </property>
@@ -368,6 +676,20 @@
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton{
+	background: rgb(75, 108, 183);
+	color: black;
+}
+QPushButton:hover {
+	background: rgb(62, 90, 150);
+	color: black;
+}
+QPushButton:pressed {
+	background: rgb(75, 108, 183);
+	color: black;
+}</string>
        </property>
        <property name="text">
         <string>6</string>
@@ -388,6 +710,20 @@
          <bold>true</bold>
         </font>
        </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton{
+	background: rgb(24, 40, 72);
+	color: white;
+}
+QPushButton:hover{
+	background: rgb(34, 57, 102);
+	color: white;
+}
+QPushButton:pressed{
+	background: rgb(24, 40, 72);
+	color: white;
+}</string>
+       </property>
        <property name="text">
         <string>⌫</string>
        </property>
@@ -400,6 +736,20 @@
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton{
+	background: rgb(24, 40, 72);
+	color: white;
+}
+QPushButton:hover{
+	background: rgb(34, 57, 102);
+	color: white;
+}
+QPushButton:pressed{
+	background: rgb(24, 40, 72);
+	color: white;
+}</string>
        </property>
        <property name="text">
         <string>C</string>
