@@ -275,5 +275,8 @@ void Widget::on_btnEqual_clicked()
     }
 }
 
-
+void Widget::on_display_editingFinished()  //文本框直接输入数字获取逻辑
+{
+    operand = qobject_cast<QLineEdit*>(sender())->text();
+}
 

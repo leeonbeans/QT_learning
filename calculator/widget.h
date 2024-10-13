@@ -42,6 +42,8 @@ private slots:
 
     void on_btnCleanBorad_clicked();
 
+    void on_display_editingFinished();
+
 private:
     Ui::Widget *ui;
 };
