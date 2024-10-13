@@ -3,6 +3,8 @@
 
 #include <QWidget>
 #include <QStack>
+#include <QMap>
+#include <QPushButton>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -22,7 +24,9 @@ public:
     QString opcode;
     QStack<QString> operandStack;
     QString opcodePrevious = "";
-
+    QMap<int, QPushButton*> btnNums;
+    QMap<int, QPushButton*> btnBinary;
+    QMap<QString, QPushButton*> btnUnary;
     QString calculation(bool &ifLegaL);
 
 private slots:
@@ -43,6 +47,8 @@ private slots:
     void on_btnCleanBorad_clicked();
 
     void on_display_editingFinished();
+
+    virtual void keyPressEvent(QKeyEvent *event);
 
 private:
     Ui::Widget *ui;

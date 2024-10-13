@@ -17,7 +17,10 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>Widget</string>
+   <string>计算器</string>
+  </property>
+  <property name="windowIcon">
+   <iconset theme="accessories-calculator"/>
   </property>
   <property name="styleSheet">
    <string notr="true">background-color: silver;</string>
@@ -58,7 +61,7 @@ QPushButton:hover {
 	color: black;
 }
 QPushButton:pressed {
-	background: rgb(75, 108, 183);
+	background: rgb(56, 78, 129);
 	color: black;
 }</string>
        </property>
@@ -85,7 +88,7 @@ QPushButton:hover{
 	color: white;
 }
 QPushButton:pressed{
-	background: rgb(24, 40, 72);
+	background: rgb(44, 75, 132);
 	color: white;
 }</string>
        </property>
@@ -117,7 +120,7 @@ QPushButton:hover{
 	color: white;
 }
 QPushButton:pressed{
-	background: rgb(24, 40, 72);
+	background: rgb(44, 75, 132);
 	color: white;
 }</string>
        </property>
@@ -144,7 +147,7 @@ QPushButton:hover {
 	color: black;
 }
 QPushButton:pressed {
-	background: rgb(75, 108, 183);
+	background: rgb(56, 78, 129);
 	color: black;
 }</string>
        </property>
@@ -171,7 +174,7 @@ QPushButton:hover {
 	color: black;
 }
 QPushButton:pressed {
-	background: rgb(75, 108, 183);
+	background: rgb(56, 78, 129);
 	color: black;
 }</string>
        </property>
@@ -198,7 +201,7 @@ QPushButton:hover{
 	color: white;
 }
 QPushButton:pressed{
-	background: rgb(24, 40, 72);
+	background: rgb(44, 75, 132);
 	color: white;
 }</string>
        </property>
@@ -225,7 +228,7 @@ QPushButton:hover {
 	color: black;
 }
 QPushButton:pressed {
-	background: rgb(75, 108, 183);
+	background: rgb(56, 78, 129);
 	color: black;
 }</string>
        </property>
@@ -252,7 +255,7 @@ QPushButton:hover {
 	color: black;
 }
 QPushButton:pressed {
-	background: rgb(75, 108, 183);
+	background: rgb(56, 78, 129);
 	color: black;
 }</string>
        </property>
@@ -279,7 +282,7 @@ QPushButton:hover {
 	color: black;
 }
 QPushButton:pressed {
-	background: rgb(75, 108, 183);
+	background: rgb(56, 78, 129);
 	color: black;
 }</string>
        </property>
@@ -306,7 +309,7 @@ QPushButton:hover {
 	color: black;
 }
 QPushButton:pressed {
-	background: rgb(75, 108, 183);
+	background: rgb(56, 78, 129);
 	color: black;
 }</string>
        </property>
@@ -333,7 +336,7 @@ QPushButton:hover {
 	color: black;
 }
 QPushButton:pressed {
-	background: rgb(75, 108, 183);
+	background: rgb(56, 78, 129);
 	color: black;
 }</string>
        </property>
@@ -365,7 +368,7 @@ QPushButton:hover{
 	color: white;
 }
 QPushButton:pressed{
-	background: rgb(24, 40, 72);
+	background: rgb(44, 75, 132);
 	color: white;
 }</string>
        </property>
@@ -423,7 +426,7 @@ QPushButton:hover {
 	color: black;
 }
 QPushButton:pressed {
-	background: rgb(75, 108, 183);
+	background: rgb(56, 78, 129);
 	color: black;
 }</string>
        </property>
@@ -450,7 +453,7 @@ QPushButton:hover{
 	color: white;
 }
 QPushButton:pressed{
-	background: rgb(24, 40, 72);
+	background: rgb(44, 75, 132);
 	color: white;
 }</string>
        </property>
@@ -482,7 +485,7 @@ QPushButton:hover{
 	color: white;
 }
 QPushButton:pressed{
-	background: rgb(24, 40, 72);
+	background: rgb(44, 75, 132);
 	color: white;
 }</string>
        </property>
@@ -509,7 +512,7 @@ QPushButton:hover {
 	color: black;
 }
 QPushButton:pressed {
-	background: rgb(75, 108, 183);
+	background: rgb(56, 78, 129);
 	color: black;
 }</string>
        </property>
@@ -536,7 +539,7 @@ QPushButton:hover{
 	color: white;
 }
 QPushButton:pressed{
-	background: rgb(24, 40, 72);
+	background: rgb(44, 75, 132);
 	color: white;
 }</string>
        </property>
@@ -568,7 +571,7 @@ QPushButton:hover{
 	color: white;
 }
 QPushButton:pressed{
-	background: rgb(24, 40, 72);
+	background: rgb(44, 75, 132);
 	color: white;
 }</string>
        </property>
@@ -595,7 +598,7 @@ QPushButton:hover {
 	color: black;
 }
 QPushButton:pressed {
-	background: rgb(75, 108, 183);
+	background: rgb(56, 78, 129);
 	color: black;
 }</string>
        </property>
@@ -623,11 +626,11 @@ QPushButton:pressed {
 	color: white;
 }
 QPushButton:hover{
-	background: rgb(186, 124, 0);
+	background: rgb(218, 127, 0);
 	color: white;
 }
 QPushButton:pressed{
-	background: rgb(225, 150, 0);
+	background: rgb(186, 124, 0);
 	color: white;
 }
 </string>
@@ -660,7 +663,7 @@ QPushButton:hover{
 	color: white;
 }
 QPushButton:pressed{
-	background: rgb(24, 40, 72);
+	background: rgb(44, 75, 132);
 	color: white;
 }</string>
        </property>
@@ -687,7 +690,7 @@ QPushButton:hover {
 	color: black;
 }
 QPushButton:pressed {
-	background: rgb(75, 108, 183);
+	background: rgb(56, 78, 129);
 	color: black;
 }</string>
        </property>
@@ -720,7 +723,7 @@ QPushButton:hover{
 	color: white;
 }
 QPushButton:pressed{
-	background: rgb(24, 40, 72);
+	background: rgb(44, 75, 132);
 	color: white;
 }</string>
        </property>
@@ -747,7 +750,7 @@ QPushButton:hover{
 	color: white;
 }
 QPushButton:pressed{
-	background: rgb(24, 40, 72);
+	background: rgb(44, 75, 132);
 	color: white;
 }</string>
        </property>

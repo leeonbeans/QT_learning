@@ -1,32 +1,49 @@
 #include "widget.h"
 #include "ui_widget.h"
+#include "QKeyEvent"
 
 Widget::Widget(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::Widget)
 {
     ui->setupUi(this);
-    connect(ui->btnNum0,SIGNAL(clicked()),this,SLOT(btnNumClicked()));
-    connect(ui->btnNum1,SIGNAL(clicked()),this,SLOT(btnNumClicked()));
-    connect(ui->btnNum2,SIGNAL(clicked()),this,SLOT(btnNumClicked()));
-    connect(ui->btnNum3,SIGNAL(clicked()),this,SLOT(btnNumClicked()));
-    connect(ui->btnNum4,SIGNAL(clicked()),this,SLOT(btnNumClicked()));
-    connect(ui->btnNum5,SIGNAL(clicked()),this,SLOT(btnNumClicked()));
-    connect(ui->btnNum6,SIGNAL(clicked()),this,SLOT(btnNumClicked()));
-    connect(ui->btnNum7,SIGNAL(clicked()),this,SLOT(btnNumClicked()));
-    connect(ui->btnNum8,SIGNAL(clicked()),this,SLOT(btnNumClicked()));
-    connect(ui->btnNum9,SIGNAL(clicked()),this,SLOT(btnNumClicked()));
 
-    connect(ui->btnPlus,SIGNAL(clicked()),this,SLOT(btnBinaryOperatorClicked()));
-    connect(ui->btnMinus,SIGNAL(clicked()),this,SLOT(btnBinaryOperatorClicked()));
-    connect(ui->btnMultiply,SIGNAL(clicked()),this,SLOT(btnBinaryOperatorClicked()));
-    connect(ui->btnDivide,SIGNAL(clicked()),this,SLOT(btnBinaryOperatorClicked()));
+    btnNums =   {{Qt::Key_0, ui->btnNum0},
+                {Qt::Key_1, ui->btnNum1},
+                {Qt::Key_2, ui->btnNum2},
+                {Qt::Key_3, ui->btnNum3},
+                {Qt::Key_4, ui->btnNum4},
+                {Qt::Key_5, ui->btnNum5},
+                {Qt::Key_6, ui->btnNum6},
+                {Qt::Key_7, ui->btnNum7},
+                {Qt::Key_8, ui->btnNum8},
+                {Qt::Key_9, ui->btnNum9},
+    };
 
-    connect(ui->btnPercent,SIGNAL(clicked()),this,SLOT(btnUnaryOperatorClicked()));
-    connect(ui->btnFraction,SIGNAL(clicked()),this,SLOT(btnUnaryOperatorClicked()));
-    connect(ui->btnSquare,SIGNAL(clicked()),this,SLOT(btnUnaryOperatorClicked()));
-    connect(ui->btnSquareRoot,SIGNAL(clicked()),this,SLOT(btnUnaryOperatorClicked()));
-    connect(ui->btnInverse,SIGNAL(clicked()),this,SLOT(btnUnaryOperatorClicked()));
+    foreach (auto btn, btnNums) {
+        connect(btn,SIGNAL(clicked()),this,SLOT(btnNumClicked()));
+    }
+
+    btnBinary = {{Qt::Key_Plus,ui->btnPlus},
+                 {Qt::Key_Minus,ui->btnMinus},
+                 {Qt::Key_Asterisk,ui->btnMultiply},
+                 {Qt::Key_Slash,ui->btnDivide}
+    };
+
+    foreach (auto btn, btnBinary) {
+        connect(btn,SIGNAL(clicked()),this,SLOT(btnBinaryOperatorClicked()));
+    }
+
+    btnUnary = {{"Percent",ui->btnPercent},
+                 {"Fraction",ui->btnFraction},
+                 {"Square",ui->btnSquare},
+                 {"SquareRoot",ui->btnSquareRoot},
+                 {"Inverse",ui->btnInverse}
+    };
+
+    foreach (auto btn, btnUnary){
+        connect(btn,SIGNAL(clicked()),this,SLOT(btnUnaryOperatorClicked()));
+    }
 }
 
 Widget::~Widget()
@@ -48,25 +65,25 @@ QString Widget::calculation(bool &ifLegal)
     QString opertor = opcodePrevious;
     opcodePrevious = "";
 
-    if (opertor == "+")
+    if (opertor == "+")  //加法
     {
         result = num_1+num_2;
         ifLegal = true;
         return QString::number(result);
     }
-    else if (opertor == "-")
+    else if (opertor == "-")  //减法
     {
         result = num_1-num_2;
         ifLegal = true;
         return QString::number(result);
     }
-    else if (opertor == "×")
+    else if (opertor == "×")  //乘法
     {
         result = num_1*num_2;
         ifLegal = true;
         return QString::number(result);
     }
-    else if (opertor == "÷")
+    else if (opertor == "÷")  //除法
     {
         if (num_2 != 0)
         {
@@ -93,12 +110,12 @@ void Widget::btnNumClicked()  //数字添加逻辑
     QString btnText=qobject_cast<QPushButton*>(sender())->text();
     if (btnText != "0")
     {
-        if (operand == "0")
+        if (operand == "0")  //若当前显示数字为0,则直接替换成所按的数字
             operand = btnText;
         else
             operand += btnText;
     }
-    else
+    else  //限制添加无意义的高位"0"
     {
         if (operand != "0")
             operand += btnText;
@@ -152,7 +169,19 @@ void Widget::btnUnaryOperatorClicked()  //一元操作符逻辑
     opcode = qobject_cast<QPushButton*>(sender())->text();
 
     if (operand.isNull()|| operand == "")
-        return;
+    {
+        if (opcodePrevious.isNull() || opcodePrevious == "")  //当按了二元操作符又立刻按了一元操作符的特殊情况
+        {
+            return;
+        }
+        else
+        {
+            qDebug()<<"dasd";
+            operand = operandStack.top();
+            operandStack.pop();
+            opcodePrevious = "";
+        }
+    }
 
     if (opcode == "¹/x")  //倒数
     {
@@ -241,7 +270,7 @@ void Widget::on_btnCleanBorad_clicked()  //CE键清版
     ui->display->setText(operand);
 }
 
-void Widget::on_btnEqual_clicked()
+void Widget::on_btnEqual_clicked()  //等于按钮逻辑
 {
     bool ifLegal = false;  //判断计算有效的布尔值
 
@@ -278,5 +307,27 @@ void Widget::on_btnEqual_clicked()
 void Widget::on_display_editingFinished()  //文本框直接输入数字获取逻辑
 {
     operand = qobject_cast<QLineEdit*>(sender())->text();
+}
+
+
+void Widget::keyPressEvent(QKeyEvent *event)  //键盘输入逻辑
+{
+    foreach(auto btn, btnNums.keys())  //数字
+    {
+        if (event->key() == btn)
+            btnNums[btn]->animateClick();
+    }
+
+    foreach(auto btn, btnBinary.keys())  //二元操作键
+    {
+        if (event->key() == btn)
+            btnBinary[btn]->animateClick();
+    }
+
+    if (event->key() == Qt::Key_Backspace)  //退格键
+        ui->btnBackSpace->animateClick();
+
+    if (event->key() == Qt::Key_Equal || event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)  //等于键和enter键
+        ui->btnEqual->animateClick();
 }
 
