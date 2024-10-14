@@ -52,7 +52,7 @@ Widget::~Widget()
     delete ui;
 }
 
-QString Widget::calculation(bool &ifLegal)
+QString Widget::calculation(bool &ifLegal)  //计算
 {
     //取栈里面的数
     double num_2 = operandStack.top().toDouble();
@@ -130,6 +130,8 @@ void Widget::btnBinaryOperatorClicked()  //二元操作符逻辑
     bool ifLegal = false;  //操作有效布尔值
     opcode = qobject_cast<QPushButton*>(sender())->text();
 
+    continuousEqual.clear();
+
     //存入数字
     if (operand == "")  //若空则只改变当前操作符
     {
@@ -154,6 +156,7 @@ void Widget::btnBinaryOperatorClicked()  //二元操作符逻辑
             operand = "";
             opcodePrevious = "";
             operandStack.clear();
+            continuousEqual.clear();
             ui->display->setText(result);
         }
     }
@@ -168,6 +171,8 @@ void Widget::btnUnaryOperatorClicked()  //一元操作符逻辑
 {
     double result=0;
     opcode = qobject_cast<QPushButton*>(sender())->text();
+
+    continuousEqual.clear();
 
     if (operand.isNull()|| operand == "")
     {
@@ -191,6 +196,7 @@ void Widget::btnUnaryOperatorClicked()  //一元操作符逻辑
             operand = "";
             opcodePrevious = "";
             operandStack.clear();
+            continuousEqual.clear();
             ui->display->setText("除数不能为0!");
             return;
         }
@@ -225,6 +231,7 @@ void Widget::btnUnaryOperatorClicked()  //一元操作符逻辑
         operand = "";
         opcodePrevious = "";
         operandStack.clear();
+        continuousEqual.clear();
         ui->display->setText("ERROR!");
     }
 
@@ -261,6 +268,7 @@ void Widget::on_btnCleanAll_clicked()  //C键清除所有
     operand = "";
     opcodePrevious = "";
     operandStack.clear();
+    continuousEqual.clear();
     ui->display->setText(operand);
 }
 
@@ -275,11 +283,18 @@ void Widget::on_btnEqual_clicked()  //等于按钮逻辑
 {
     bool ifLegal = false;  //判断计算有效的布尔值
 
-    if (opcodePrevious.isNull() || opcodePrevious == "")  //如果先前没有输入操作符，那就什么都不做
+    if (continuousEqual.size==1 && continuousEqual.size>0) //连续计算逻辑
+    {
+        operandStack.push(operand);  //添加目前结果为第一元
+        operandStack.push(continuousEqual.operandLast);  //添加上一个第二元
+        opcodePrevious = continuousEqual.opcodeLast;  //添加上一个操作符
+        continuousEqual.clear();  //清除本次记录
+    }
+    else if (opcodePrevious.isNull() || opcodePrevious == "")  //如果先前没有输入操作符，那就什么都不做
     {
         return;
     }
-    else if (operand == "")  //如果什么都没输 默认为输入了0
+    else if (operand == "")  //如果输入了操作符 但第二元什么都没输 默认为输入了0
     {
         operandStack.push_back("0");
     }
@@ -287,6 +302,8 @@ void Widget::on_btnEqual_clicked()  //等于按钮逻辑
     {
         operandStack.push_back(operand);
     }
+
+    continuousEqual.add(operandStack.top(),opcodePrevious);  //连续计算逻辑--添加当前操作符与第二元操作数
 
     //计算逻辑
     QString result = calculation(ifLegal);
@@ -302,6 +319,7 @@ void Widget::on_btnEqual_clicked()  //等于按钮逻辑
         opcodePrevious = "";
         operandStack.clear();
         ui->display->setText(result);
+        continuousEqual.clear();
     }
 }
 
@@ -330,5 +348,8 @@ void Widget::keyPressEvent(QKeyEvent *event)  //键盘输入逻辑
 
     if (event->key() == Qt::Key_Equal || event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)  //等于键和enter键
         ui->btnEqual->animateClick();
+
+    if (event->key() == Qt::Key_Period)  //小数点
+        ui->btnDecimal->animateClick();
 }
 

@@ -21,13 +21,34 @@ public:
     ~Widget();
 
     QString operand = "";
-    QString opcode;
+    QString opcode = "";
     QStack<QString> operandStack;
     QString opcodePrevious = "";
     QMap<int, QPushButton*> btnNums;
     QMap<int, QPushButton*> btnBinary;
     QMap<QString, QPushButton*> btnUnary;
     QString calculation(bool &ifLegaL);
+
+    struct{
+        QString operandLast = "";
+        QString opcodeLast = "";
+        int size = 0;
+
+        void add(QString operand,QString opcode)
+        {
+            operandLast = operand;
+            opcodeLast = opcode;
+            size+=1;
+        }
+
+        void clear()
+        {
+            operandLast = "";
+            opcodeLast = "";
+            size = 0;
+        }
+
+    }continuousEqual;
 
 private slots:
     void btnNumClicked();
