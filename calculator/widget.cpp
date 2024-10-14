@@ -182,7 +182,6 @@ void Widget::btnUnaryOperatorClicked()  //一元操作符逻辑
         }
         else
         {
-            qDebug()<<"dasd";
             operand = operandStack.top();
             operandStack.pop();
             opcodePrevious = "";
