@@ -7,6 +7,7 @@ Widget::Widget(QWidget *parent)
     , ui(new Ui::Widget)
 {
     ui->setupUi(this);
+    setWindowIcon(QIcon("icon.ico"));
 
     btnNums =   {{Qt::Key_0, ui->btnNum0},
                 {Qt::Key_1, ui->btnNum1},

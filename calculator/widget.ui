@@ -17,10 +17,7 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>计算器</string>
-  </property>
-  <property name="windowIcon">
-   <iconset theme="accessories-calculator"/>
+   <string>计算器-叶力维-2022414120125</string>
   </property>
   <property name="styleSheet">
    <string notr="true">background-color: silver;</string>
