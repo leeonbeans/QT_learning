@@ -22,5 +22,6 @@
         <file>icons/statusbar.png</file>
         <file>icons/toolbar.png</file>
         <file>icons/undo.png</file>
+        <file>icons/mainIcon.png</file>
     </qresource>
 </RCC>

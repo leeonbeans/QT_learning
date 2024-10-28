@@ -21,6 +21,9 @@ public:
     QLabel statusCursorLable;
     QLabel statusLable;
 
+private slots:
+    void on_actionAbout_triggered();
+
 private:
     Ui::MainWindow *ui;
 };
