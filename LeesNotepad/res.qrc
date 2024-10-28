@@ -1,0 +1,26 @@
+<RCC>
+    <qresource prefix="/">
+        <file>icons/newFile.png</file>
+        <file>icons/about.png</file>
+        <file>icons/autoWrap.png</file>
+        <file>icons/copy.png</file>
+        <file>icons/cut.png</file>
+        <file>icons/editorColor.png</file>
+        <file>icons/exit.png</file>
+        <file>icons/find.png</file>
+        <file>icons/font.png</file>
+        <file>icons/fontBackgroundColor.png</file>
+        <file>icons/fontColor.png</file>
+        <file>icons/lineNumber.png</file>
+        <file>icons/openFile.png</file>
+        <file>icons/paste.png</file>
+        <file>icons/redo.png</file>
+        <file>icons/replase.png</file>
+        <file>icons/save.png</file>
+        <file>icons/saveAs.png</file>
+        <file>icons/selectAll.png</file>
+        <file>icons/statusbar.png</file>
+        <file>icons/toolbar.png</file>
+        <file>icons/undo.png</file>
+    </qresource>
+</RCC>
