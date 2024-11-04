@@ -14,7 +14,8 @@
    <string>关于</string>
   </property>
   <property name="windowIcon">
-   <iconset theme="QIcon::ThemeIcon::HelpFaq"/>
+   <iconset resource="res.qrc">
+    <normaloff>:/icons/about.png</normaloff>:/icons/about.png</iconset>
   </property>
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">
@@ -116,7 +117,9 @@
    </layout>
   </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="res.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>buttonBox</sender>
