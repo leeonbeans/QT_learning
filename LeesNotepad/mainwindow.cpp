@@ -67,7 +67,7 @@ void MainWindow::on_actionAbout_triggered()
 
 void MainWindow::on_actionFind_triggered()
 {
-    SearchDialog searchDialog;
+    SearchDialog searchDialog(this, ui->textEdit);
     searchDialog.exec();
 }
 
