@@ -15,6 +15,7 @@ public:
     explicit AboutDialog(QWidget *parent = nullptr);
     ~AboutDialog();
 
+
 private:
     Ui::AboutDialog *ui;
 };
