@@ -17,11 +17,11 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
 
     //添加信息至状态栏
-    statusLable.setMaximumWidth(150);
+    statusLable.setMaximumWidth(180);
     statusLable.setText("Length: " + QString::number(0) + " Lines: " + QString::number(1) + "  ");
     ui->statusbar->addPermanentWidget(&statusLable);
 
-    statusCursorLable.setMaximumWidth(150);
+    statusCursorLable.setMaximumWidth(180);
     statusCursorLable.setText("Ln: " + QString::number(0) + " Col: " + QString::number(1) + "  ");
     ui->statusbar->addPermanentWidget(&statusCursorLable);
 
@@ -51,6 +51,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->actionStatusbar->setChecked(true);
     ui->actionToolbar->setChecked(true);
+
+    ui->actionLineNumber->setChecked(true);
 }
 
 MainWindow::~MainWindow()
@@ -97,6 +99,9 @@ void MainWindow::on_actionOpen_triggered()
         return;
 
     QString filename = QFileDialog::getOpenFileName(this, tr("打开文件"), ".", tr("Text files (*.txt) ;; All (*.*)"));
+    if (filename == "")
+        return;
+
     QFile file(filename);
 
     if (!file.open(QFile::ReadOnly | QFile::Text))
@@ -124,6 +129,8 @@ void MainWindow::on_actionSave_triggered()
     if (!file.open(QFile::WriteOnly | QFile::Text))
     {
         QString filename = QFileDialog::getSaveFileName(this, tr("保存文件"), ".", tr("Text files (*.txt)"));
+        if (filename == "")
+            return;
 
         file.setFileName(filename);
         if (!file.open(QFile::WriteOnly | QFile::Text))
@@ -148,6 +155,8 @@ void MainWindow::on_actionSave_triggered()
 void MainWindow::on_actionSaveAs_triggered()
 {
     QString filename = QFileDialog::getSaveFileName(this, tr("保存文件"), ".", tr("Text files (*.txt)"));
+    if (filename == "")
+        return;
 
     QFile file(filename);
     if (!file.open(QFile::WriteOnly | QFile::Text))
@@ -175,6 +184,8 @@ void MainWindow::on_textEdit_textChanged()
         this->setWindowTitle("*"+this->windowTitle());
         textChanged = true;
     }
+
+    statusLable.setText("Length: " + QString::number(ui->textEdit->toPlainText().length()) + " Lines: " + QString::number(ui->textEdit->document()->lineCount()) + "  ");
 }
 
 bool MainWindow::changedConfirm()  //用户确认返回true 用户取消返回false
@@ -347,5 +358,35 @@ void MainWindow::on_actionExit_triggered()
 {
     if(changedConfirm())
         exit(0);
+}
+
+
+
+void MainWindow::on_textEdit_cursorPositionChanged()
+{
+    int col = 0;
+    int ln = 0;
+    int flg = -1;
+    int pos=ui->textEdit->textCursor().position();
+    QString text = ui->textEdit->toPlainText();
+
+    for (int i = 0; i < pos; i++)
+    {
+        if (text[i] == '\n')
+        {
+            ln++;
+            flg=i;
+        }
+    }
+
+    flg++;
+    col = pos - flg;
+    statusCursorLable.setText("Ln: " + QString::number(ln+1) + " Col: " + QString::number(col+1) + "  ");
+}
+
+
+void MainWindow::on_actionLineNumber_triggered(bool checked)
+{
+    ui->textEdit->hideLineNumberArea(!checked);
 }
 
