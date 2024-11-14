@@ -390,3 +390,10 @@ void MainWindow::on_actionLineNumber_triggered(bool checked)
     ui->textEdit->hideLineNumberArea(!checked);
 }
 
+void MainWindow::closeEvent(QCloseEvent * event)
+{
+    if (changedConfirm())
+        event->accept();
+    else
+        event->ignore();
+}
