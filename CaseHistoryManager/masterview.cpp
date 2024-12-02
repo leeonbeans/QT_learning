@@ -2,7 +2,7 @@
 #include "ui_masterview.h"
 
 MasterView::MasterView(QWidget *parent)
-    : QMainWindow(parent)
+    : QWidget(parent)
     , ui(new Ui::MasterView)
 {
     ui->setupUi(this);
