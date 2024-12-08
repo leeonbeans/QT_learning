@@ -1,13 +1,17 @@
 #include "masterview.h"
 #include "ui_masterview.h"
+#include <QDebug>
 
 MasterView::MasterView(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::MasterView)
 {
     ui->setupUi(this);
-
     goLoginView();
+    ui->btnBack->setEnabled(false);
+    ui->btnLogout->setEnabled(false);
+
+    this->setWindowFlag(Qt::FramelessWindowHint);
 }
 
 MasterView::~MasterView()
@@ -22,12 +26,17 @@ void MasterView::goLoginView()
 
     connect(loginView, SIGNAL(loginSuccess()), this, SLOT(goWelcomeView()));
 
+
 }
 
 void MasterView::goWelcomeView()
 {
     welcomeView = new WelcomeView(this);
     pushWidgetToStackView(welcomeView);
+
+    connect(welcomeView, SIGNAL(goDepartmentView()), this, SLOT(goDepartmentView()));
+    connect(welcomeView, SIGNAL(goDoctorView()), this, SLOT(goDoctorView()));
+    connect(welcomeView, SIGNAL(goPatientView()), this, SLOT(goPatientView()));
 }
 
 void MasterView::goDoctorView()
@@ -52,6 +61,8 @@ void MasterView::goPatientView()
 {
     patientView = new PatientView(this);
     pushWidgetToStackView(patientView);
+
+    connect(patientView, SIGNAL(goPatientEditView()), this, SLOT(goPatientEditView()));
 }
 
 void MasterView::goPreviousView()
@@ -66,7 +77,6 @@ void MasterView::goPreviousView()
         QWidget *widget = ui->stackedWidget->widget(count - 1);
         ui->stackedWidget->removeWidget(widget);
         delete widget;
-
     }
 }
 
@@ -80,6 +90,40 @@ void MasterView::pushWidgetToStackView(QWidget *widget)
 }
 
 void MasterView::on_btnBack_clicked()
+{
+    goPreviousView();
+}
+
+
+void MasterView::on_stackedWidget_currentChanged(int arg1)
+{
+    int count = ui->stackedWidget->count();
+    if(count > 1){
+        ui->btnBack->setEnabled(true);
+    }
+    else
+        ui->btnBack->setEnabled(false);
+
+    QString title = ui->stackedWidget->currentWidget()->windowTitle();
+
+    if (title == "欢迎")
+    {
+        ui->btnBack->setEnabled(false);
+        ui->btnLogout->setEnabled(true);
+    }
+    else
+    {
+        ui->btnLogout->setEnabled(false);
+    }
+    if (title == "登录")
+    {
+        ui->btnBack->setEnabled(false);
+        ui->btnLogout->setEnabled(false);
+    }
+}
+
+
+void MasterView::on_btnLogout_clicked()
 {
     goPreviousView();
 }

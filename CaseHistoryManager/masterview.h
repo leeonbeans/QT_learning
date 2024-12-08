@@ -35,6 +35,10 @@ public slots:
 private slots:
     void on_btnBack_clicked();
 
+    void on_stackedWidget_currentChanged(int arg1);
+
+    void on_btnLogout_clicked();
+
 private:
     void pushWidgetToStackView(QWidget *widget);
 
