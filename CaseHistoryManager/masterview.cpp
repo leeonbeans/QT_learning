@@ -1,6 +1,7 @@
 #include "masterview.h"
 #include "ui_masterview.h"
 #include <QDebug>
+#include "idatabase.h"
 
 MasterView::MasterView(QWidget *parent)
     : QWidget(parent)
@@ -12,6 +13,8 @@ MasterView::MasterView(QWidget *parent)
     ui->btnLogout->setEnabled(false);
 
     this->setWindowFlag(Qt::FramelessWindowHint);
+
+    IDatabase::getInstance();
 }
 
 MasterView::~MasterView()
