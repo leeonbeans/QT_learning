@@ -16,6 +16,13 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    bool started;
+
+public slots:
+    void logMessage(const QString &msg);
+
+private slots:
+    void on_startStopButton_clicked();
 
 private:
     Ui::MainWindow *ui;

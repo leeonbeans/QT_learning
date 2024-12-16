@@ -52,10 +52,10 @@ public:
     QWidget *chatPage;
     QVBoxLayout *verticalLayout_2;
     QHBoxLayout *horizontalLayout;
-    QTextEdit *textEdit;
-    QListWidget *listWidget;
+    QTextEdit *roomTextEdit;
+    QListWidget *userListWidget;
     QHBoxLayout *horizontalLayout_2;
-    QLineEdit *lineEdit;
+    QLineEdit *sayLineEdit;
     QPushButton *sayButton;
     QPushButton *logoutButton;
 
@@ -172,26 +172,26 @@ public:
         verticalLayout_2->setObjectName("verticalLayout_2");
         horizontalLayout = new QHBoxLayout();
         horizontalLayout->setObjectName("horizontalLayout");
-        textEdit = new QTextEdit(chatPage);
-        textEdit->setObjectName("textEdit");
+        roomTextEdit = new QTextEdit(chatPage);
+        roomTextEdit->setObjectName("roomTextEdit");
 
-        horizontalLayout->addWidget(textEdit);
+        horizontalLayout->addWidget(roomTextEdit);
 
-        listWidget = new QListWidget(chatPage);
-        listWidget->setObjectName("listWidget");
-        listWidget->setMaximumSize(QSize(120, 16777215));
+        userListWidget = new QListWidget(chatPage);
+        userListWidget->setObjectName("userListWidget");
+        userListWidget->setMaximumSize(QSize(120, 16777215));
 
-        horizontalLayout->addWidget(listWidget);
+        horizontalLayout->addWidget(userListWidget);
 
 
         verticalLayout_2->addLayout(horizontalLayout);
 
         horizontalLayout_2 = new QHBoxLayout();
         horizontalLayout_2->setObjectName("horizontalLayout_2");
-        lineEdit = new QLineEdit(chatPage);
-        lineEdit->setObjectName("lineEdit");
+        sayLineEdit = new QLineEdit(chatPage);
+        sayLineEdit->setObjectName("sayLineEdit");
 
-        horizontalLayout_2->addWidget(lineEdit);
+        horizontalLayout_2->addWidget(sayLineEdit);
 
         sayButton = new QPushButton(chatPage);
         sayButton->setObjectName("sayButton");
@@ -214,7 +214,7 @@ public:
 
         retranslateUi(MainWindow);
 
-        stackedWidget->setCurrentIndex(0);
+        stackedWidget->setCurrentIndex(1);
 
 
         QMetaObject::connectSlotsByName(MainWindow);
@@ -222,7 +222,7 @@ public:
 
     void retranslateUi(QMainWindow *MainWindow)
     {
-        MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "MainWindow", nullptr));
+        MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "\350\201\212\345\244\251\345\256\244\345\256\242\346\210\267\347\253\257", nullptr));
         titleLabel->setText(QCoreApplication::translate("MainWindow", "\345\217\266\345\212\233\347\273\264\347\232\204\350\201\212\345\244\251\345\256\244", nullptr));
         label_2->setText(QCoreApplication::translate("MainWindow", "\346\234\215\345\212\241\345\231\250\345\234\260\345\235\200\357\274\232", nullptr));
         label_3->setText(QCoreApplication::translate("MainWindow", "\346\230\265\347\247\260\357\274\232", nullptr));

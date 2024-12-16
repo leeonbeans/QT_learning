@@ -29,7 +29,7 @@ public:
     QVBoxLayout *verticalLayout_2;
     QGroupBox *groupBox;
     QVBoxLayout *verticalLayout;
-    QPlainTextEdit *plainTextEdit;
+    QPlainTextEdit *logEditor;
     QHBoxLayout *horizontalLayout;
     QSpacerItem *horizontalSpacer;
     QPushButton *startStopButton;
@@ -47,10 +47,10 @@ public:
         groupBox->setObjectName("groupBox");
         verticalLayout = new QVBoxLayout(groupBox);
         verticalLayout->setObjectName("verticalLayout");
-        plainTextEdit = new QPlainTextEdit(groupBox);
-        plainTextEdit->setObjectName("plainTextEdit");
+        logEditor = new QPlainTextEdit(groupBox);
+        logEditor->setObjectName("logEditor");
 
-        verticalLayout->addWidget(plainTextEdit);
+        verticalLayout->addWidget(logEditor);
 
 
         verticalLayout_2->addWidget(groupBox);
@@ -78,7 +78,7 @@ public:
 
     void retranslateUi(QMainWindow *MainWindow)
     {
-        MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "MainWindow", nullptr));
+        MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "\350\201\212\345\244\251\345\256\244\346\234\215\345\212\241\345\231\250", nullptr));
         groupBox->setTitle(QCoreApplication::translate("MainWindow", "\346\234\215\345\212\241\345\231\250\346\227\245\345\277\227", nullptr));
         startStopButton->setText(QCoreApplication::translate("MainWindow", "\345\220\257\345\212\250\346\234\215\345\212\241\345\231\250", nullptr));
     } // retranslateUi
