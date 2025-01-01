@@ -27,7 +27,11 @@ private slots:
 
     void connectedToServer();
 
-    void messageReceived(const QString &text);
+    void messageReceived(const QString &sender,const QString &text);
+    void jsonReceived(const QJsonObject &docObj);
+    void userJoined(const QString &user);
+    void userLefted(const QString &user);
+    void userListReceived(const QStringList &list);
 
 private:
     Ui::MainWindow *ui;
