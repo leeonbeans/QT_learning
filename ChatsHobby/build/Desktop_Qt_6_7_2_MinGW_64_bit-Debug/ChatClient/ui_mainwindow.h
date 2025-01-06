@@ -223,7 +223,7 @@ public:
     void retranslateUi(QMainWindow *MainWindow)
     {
         MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "\350\201\212\345\244\251\345\256\244\345\256\242\346\210\267\347\253\257", nullptr));
-        titleLabel->setText(QCoreApplication::translate("MainWindow", "\345\217\266\345\212\233\347\273\264\347\232\204\350\201\212\345\244\251\345\256\244", nullptr));
+        titleLabel->setText(QCoreApplication::translate("MainWindow", "\345\217\266\345\212\233\347\273\264\347\232\204\350\201\212\345\244\251\345\256\244(2022414120125)", nullptr));
         label_2->setText(QCoreApplication::translate("MainWindow", "\346\234\215\345\212\241\345\231\250\345\234\260\345\235\200\357\274\232", nullptr));
         serverEdit->setText(QCoreApplication::translate("MainWindow", "127.0.0.1", nullptr));
         label_3->setText(QCoreApplication::translate("MainWindow", "\346\230\265\347\247\260\357\274\232", nullptr));
