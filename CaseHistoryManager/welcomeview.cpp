@@ -34,3 +34,9 @@ void WelcomeView::hideAdminButtons() {
     ui->btnDepartment->setVisible(false);
     ui->btnDoctor->setVisible(false);
 }
+
+void WelcomeView::on_btnMedicine_clicked()
+{
+    emit goMedicineView();
+}
+

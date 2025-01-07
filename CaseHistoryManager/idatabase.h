@@ -30,7 +30,7 @@ public:
     QString doctorLogin(const QString &username, const QString &password);
 
     bool initDoctorModel();  // 初始化医生模型
-    bool addNewDoctor();     // 添加新医生
+    int addNewDoctor();     // 添加新医生
     bool deleteCurrentDoctor();  // 删除当前医生
     bool searchDoctor(const QString &filter);  // 查询医生
     bool submitDoctorEdit();  // 提交医生信息修改
@@ -38,6 +38,16 @@ public:
 
     QSqlTableModel *doctorTabModel;  // 医生信息模型
     QItemSelectionModel *theDoctorSelection;  // 医生选择模型
+
+    bool initMedicineModel();  // 初始化药品模型
+    int addNewMedicine();     // 添加新药品
+    bool deleteCurrentMedicine();  // 删除当前药品
+    bool searchMedicine(const QString &filter);  // 查询药品
+    bool submitMedicineEdit();  // 提交药品信息修改
+    void revertMedicineEdit();  // 撤销药品信息修改
+
+    QSqlTableModel *medicineTabModel;  // 药品信息模型
+    QItemSelectionModel *theMedicineSelection;  // 药品选择模型
 
 private:
 
