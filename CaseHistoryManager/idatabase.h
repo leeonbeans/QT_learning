@@ -27,6 +27,17 @@ public:
     bool submitPatientEdit();
     void revertPatientEdit();
     int addNewPatient();
+    QString doctorLogin(const QString &username, const QString &password);
+
+    bool initDoctorModel();  // 初始化医生模型
+    bool addNewDoctor();     // 添加新医生
+    bool deleteCurrentDoctor();  // 删除当前医生
+    bool searchDoctor(const QString &filter);  // 查询医生
+    bool submitDoctorEdit();  // 提交医生信息修改
+    void revertDoctorEdit();  // 撤销医生信息修改
+
+    QSqlTableModel *doctorTabModel;  // 医生信息模型
+    QItemSelectionModel *theDoctorSelection;  // 医生选择模型
 
 private:
 

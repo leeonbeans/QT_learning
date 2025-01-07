@@ -14,6 +14,7 @@ class WelcomeView : public QWidget
 public:
     explicit WelcomeView(QWidget *parent = nullptr);
     ~WelcomeView();
+    void hideAdminButtons();
 
 private slots:
     void on_btnDepartment_clicked();

@@ -19,7 +19,7 @@ private slots:
     void on_btnLogin_clicked();
 
 signals:
-    void loginSuccess();
+    void loginSuccess(const QString &role);
     void loginFailed();
 
 private:

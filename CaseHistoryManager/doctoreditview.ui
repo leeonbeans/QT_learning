@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>DoctorEditView</class>
+ <widget class="QWidget" name="DoctorEditView">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>400</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>编辑医生信息</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QFormLayout" name="formLayout">
+     <item row="0" column="0">
+      <widget class="QLabel" name="labelUsername">
+       <property name="text">
+        <string>用户名：</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLineEdit" name="txtUsername"/>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="labelPassword">
+       <property name="text">
+        <string>密码：</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLineEdit" name="txtPassword">
+       <property name="echoMode">
+        <enum>QLineEdit::EchoMode::Password</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="labelName">
+       <property name="text">
+        <string>姓名：</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QLineEdit" name="txtName"/>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="labelGender">
+       <property name="text">
+        <string>性别：</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="labelAge">
+       <property name="text">
+        <string>年龄：</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="QSpinBox" name="spinAge"/>
+     </item>
+     <item row="5" column="0">
+      <widget class="QLabel" name="labelLicense">
+       <property name="text">
+        <string>执业证书号：</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="1">
+      <widget class="QLineEdit" name="txtLicense"/>
+     </item>
+     <item row="3" column="1">
+      <widget class="QComboBox" name="cbGender">
+       <item>
+        <property name="text">
+         <string>男</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>女</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QPushButton" name="btnSave">
+       <property name="text">
+        <string>保存</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnCancel">
+       <property name="text">
+        <string>取消</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

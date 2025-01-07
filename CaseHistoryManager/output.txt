@@ -1,0 +1,1559 @@
+
+--------------------------------------------------
+import os
+import chardet
+import time
+
+def merge_files(folder_path, output_file):
+    """
+    将文件夹中的所有代码文件内容合并到一个txt文件中
+    :param folder_path: 文件夹路径
+    :param output_file: 输出txt文件名
+    :return: 写入文件数量
+    """
+    count = 0  #记录写入的文件数量
+    # 测试能否写入文件权限
+    try:
+        with open(output_file, mode='w', encoding='utf-8') as f:
+            pass
+    except Exception as e:
+        print(f"Error: {e}")
+    # 如果文件不存在，则创建一个
+    if not os.path.exists(output_file):
+        open(output_file, 'w').close()
+    # 增加写入权限
+    os.chmod(output_file, 0o777)
+    # 打开或新建txt文件
+    with open(output_file, mode='w+', encoding='utf-8') as out_file:
+        # 获取文件夹中的文件列表
+        file_list = os.listdir(folder_path)
+        # 按照名称排序
+        file_list.sort()
+        for f in file_list:
+            # 获取文件路径
+            file_path = os.path.join(folder_path, f)
+            
+            # 如果是文件夹，则递归处理
+            if os.path.isdir(file_path):
+                #count += merge_files(file_path, output_file)
+                pass
+            # 如果是代码文件，则添加到txt中（此处如果有其他类型的文件也可以修改）
+            elif f.endswith('.py') or f.endswith('.cpp') or f.endswith('.c') or f.endswith('.java') or f.endswith('.json')or f.endswith('.ui'):
+                print(f"正在处理文件：{file_path}")
+                # 获取文件名
+                filename = os.path.splitext(f)[0]
+                # 读取文件内容
+                try:
+                    with open(file_path, mode='r', encoding='utf-8') as code_file:
+                        content = code_file.read()
+                        # print(content)
+                except UnicodeDecodeError as e:
+                    encoding = chardet.detect(open(file_path, 'rb').read())['encoding'] # 获取文件编码方式
+                    print(f"Error: {e}, skip {file_path}")
+                    # 尝试使用文件编码方式再次读取文件
+                    try:
+                        with open(file_path, mode='r', encoding=encoding) as code_file:
+                            content = code_file.read()
+                            # 将*替换掉无法解析的中文
+                            content = content.replace("\uFFFD", "*")
+                            # print(content)
+                    except Exception as e1:
+                        print(f"Error: {e1}, skip {file_path}")
+                        continue
+                #缓冲
+                out_file.flush()
+                # 添加文件名和分隔符到txt中
+                out_file.write(f"{filename}\n{'-'*50}\n")
+                # 将代码添加到txt中
+                content = content.replace('\t', ' ' * 4)  # 将制表符替换为四个空格
+                # print(content)
+                out_file.write(f"{content}\n\n")
+                # 使用缓冲区和sleep保证所有内容能够写入文件
+                os.fsync(out_file)  
+                count += 1
+                
+        
+        time.sleep(0.1)
+    return count
+   
+
+if __name__ == '__main__':
+    if os.getpid() == 0:
+        print("当前程序以系统权限运行")
+    else:
+        print("当前程序未以系统权限运行")
+    # 设置输入文件夹路径（注意使用原始字符串）
+    folder_path = r'D:\Qt\QT_learning\CaseHistoryManager'
+    # 设置输出txt文件名
+    output_file = 'output.txt'
+    # 合并文件
+    count = merge_files(folder_path, output_file)
+    print(f"共写入 {count} 个文件。")
+
+
+departmentview
+--------------------------------------------------
+#include "departmentview.h"
+#include "ui_departmentview.h"
+
+DepartmentView::DepartmentView(QWidget *parent)
+    : QWidget(parent)
+    , ui(new Ui::DepartmentView)
+{
+    ui->setupUi(this);
+}
+
+DepartmentView::~DepartmentView()
+{
+    delete ui;
+}
+
+
+departmentview
+--------------------------------------------------
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>DepartmentView</class>
+ <widget class="QWidget" name="DepartmentView">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>300</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>科室管理</string>
+  </property>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
+
+
+doctorview
+--------------------------------------------------
+#include "doctorview.h"
+#include "ui_doctorview.h"
+
+DoctorView::DoctorView(QWidget *parent)
+    : QWidget(parent)
+    , ui(new Ui::DoctorView)
+{
+    ui->setupUi(this);
+}
+
+DoctorView::~DoctorView()
+{
+    delete ui;
+}
+
+
+doctorview
+--------------------------------------------------
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>DoctorView</class>
+ <widget class="QWidget" name="DoctorView">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>300</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>医生管理</string>
+  </property>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
+
+
+idatabase
+--------------------------------------------------
+#include "idatabase.h"
+#include <QUuid>
+
+void IDatabase::initDatabase()
+{
+
+    database = QSqlDatabase::addDatabase("QSQLITE");
+    QString aFile = "C:/Users/weii/Documents/Navicat/Premium/profiles/Lab4.db";
+    database.setDatabaseName(aFile);
+
+    if(!database.open()){
+
+    }else{
+        qDebug()<<"xxx";
+    }
+}
+
+bool IDatabase::searchPatient(QString filter)
+{
+    patientTabModel->setFilter(filter);
+    return patientTabModel->select();
+}
+
+bool IDatabase::deleteCurrentPatient()
+{
+    QModelIndex curIndex = thePatientSelection->currentIndex();
+    patientTabModel->removeRow(curIndex.row());
+    patientTabModel->submitAll();
+    patientTabModel->select();
+}
+
+bool IDatabase::submitPatientEdit()
+{
+    return patientTabModel->submitAll();
+}
+
+void IDatabase::revertPatientEdit()
+{
+    patientTabModel->revertAll();
+}
+
+int IDatabase::addNewPatient()
+{
+    patientTabModel->insertRow(patientTabModel->rowCount(),QModelIndex());
+    QModelIndex curIndex = patientTabModel->index(patientTabModel->rowCount()-1,1);
+
+    int curRecNo = curIndex.row();
+    QSqlRecord curRec = patientTabModel->record(curRecNo);
+    curRec.setValue("CREATEDTIMESTAMP",QDateTime::currentDateTime().toString("yyyy-MM-dd"));
+    curRec.setValue("ID", QUuid::createUuid().toString(QUuid::WithoutBraces));
+
+    patientTabModel->setRecord(curRecNo, curRec);
+
+    return curIndex.row();
+}
+
+bool IDatabase::initPatientModel()
+{
+    patientTabModel = new QSqlTableModel(this, database);
+    patientTabModel->setTable("patient");
+    patientTabModel->setEditStrategy(QSqlTableModel::OnManualSubmit);
+    patientTabModel->setSort(patientTabModel->fieldIndex("NAME"),Qt::AscendingOrder);
+    if(!(patientTabModel->select()))
+        return false;
+
+    thePatientSelection = new QItemSelectionModel(patientTabModel);
+    return true;
+}
+
+QString IDatabase::userLogin(QString username, QString password)
+{
+    QSqlQuery query;
+    query.prepare("select USERNAME,PASSWORD from user where USERNAME = :USER");
+    query.bindValue(":USER",username);
+    query.exec();
+    if(query.first() && query.value("USERNAME").isValid()){
+        QString pd = query.value("PASSWORD").toString();
+        if(pd == password)
+        {
+            return "loginOK";
+        }
+        else{
+            qDebug()<<"sadasd";
+            return "wrongPassword";
+        }
+    }
+    else
+    {
+        return "loginFail";
+    }
+}
+
+IDatabase::IDatabase(QObject *parent): QObject{parent}
+{
+    initDatabase();
+}
+
+
+loginview
+--------------------------------------------------
+#include "loginview.h"
+#include "ui_loginview.h"
+#include "idatabase.h"
+
+LoginView::LoginView(QWidget *parent)
+    : QWidget(parent)
+    , ui(new Ui::LoginView)
+{
+    ui->setupUi(this);
+}
+
+LoginView::~LoginView()
+{
+    delete ui;
+}
+
+void LoginView::on_btnLogin_clicked()
+{
+    QString status = IDatabase::getInstance().userLogin(ui->inputUsername->text(), ui->inputPassword->text());
+
+    if(status == "loginOK")
+        emit loginSuccess();
+}
+
+
+
+loginview
+--------------------------------------------------
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>LoginView</class>
+ <widget class="QWidget" name="LoginView">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>407</width>
+    <height>292</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>登录</string>
+  </property>
+  <layout class="QFormLayout" name="formLayout">
+   <item row="0" column="1">
+    <spacer name="verticalSpacer_4">
+     <property name="orientation">
+      <enum>Qt::Orientation::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>373</width>
+       <height>37</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="1" column="0" colspan="2">
+    <widget class="QLabel" name="label">
+     <property name="font">
+      <font>
+       <pointsize>13</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>欢迎使用诊疗测试系统</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignmentFlag::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <spacer name="verticalSpacer_3">
+     <property name="orientation">
+      <enum>Qt::Orientation::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>373</width>
+       <height>37</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="3" column="0" colspan="2">
+    <layout class="QHBoxLayout" name="horizontalLayout_4">
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
+          <widget class="QLabel" name="label_2">
+           <property name="font">
+            <font>
+             <pointsize>11</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>用户名：</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="inputUsername">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>0</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <widget class="QLabel" name="label_3">
+           <property name="minimumSize">
+            <size>
+             <width>60</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>11</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>密码：</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="inputPassword">
+           <property name="alignment">
+            <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+   <item row="4" column="1">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Orientation::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>373</width>
+       <height>7</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="5" column="0" colspan="2">
+    <layout class="QHBoxLayout" name="horizontalLayout_5">
+     <item>
+      <spacer name="horizontalSpacer_3">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <item>
+        <widget class="QPushButton" name="btnSignUp">
+         <property name="text">
+          <string>注册</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnLogin">
+         <property name="text">
+          <string>登录</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_4">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+   <item row="6" column="1">
+    <spacer name="verticalSpacer_2">
+     <property name="orientation">
+      <enum>Qt::Orientation::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>373</width>
+       <height>37</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
+
+
+main
+--------------------------------------------------
+#include "masterview.h"
+
+#include <QApplication>
+
+int main(int argc, char *argv[])
+{
+    QApplication a(argc, argv);
+    MasterView w;
+    w.show();
+    return a.exec();
+}
+
+
+masterview
+--------------------------------------------------
+#include "masterview.h"
+#include "ui_masterview.h"
+#include <QDebug>
+#include "idatabase.h"
+
+MasterView::MasterView(QWidget *parent)
+    : QWidget(parent)
+    , ui(new Ui::MasterView)
+{
+    ui->setupUi(this);
+    goLoginView();
+    ui->btnBack->setEnabled(false);
+    ui->btnLogout->setEnabled(false);
+
+    this->setWindowFlag(Qt::FramelessWindowHint);
+
+    IDatabase::getInstance();
+}
+
+MasterView::~MasterView()
+{
+    delete ui;
+}
+
+void MasterView::goLoginView()
+{
+    loginView = new LoginView(this);
+    pushWidgetToStackView(loginView);
+
+    connect(loginView, SIGNAL(loginSuccess()), this, SLOT(goWelcomeView()));
+
+
+}
+
+void MasterView::goWelcomeView()
+{
+    welcomeView = new WelcomeView(this);
+    pushWidgetToStackView(welcomeView);
+
+    connect(welcomeView, SIGNAL(goDepartmentView()), this, SLOT(goDepartmentView()));
+    connect(welcomeView, SIGNAL(goDoctorView()), this, SLOT(goDoctorView()));
+    connect(welcomeView, SIGNAL(goPatientView()), this, SLOT(goPatientView()));
+}
+
+void MasterView::goDoctorView()
+{
+    doctorView = new DoctorView(this);
+    pushWidgetToStackView(doctorView);
+}
+
+void MasterView::goDepartmentView()
+{
+    departmentView = new DepartmentView(this);
+    pushWidgetToStackView(departmentView);
+}
+
+void MasterView::goPatientEditView(int rowNo)
+{
+    patientEditView = new PatientEditView(this, rowNo);
+    pushWidgetToStackView(patientEditView);
+    connect(patientEditView,SIGNAL(goPreviousView()),this,SLOT(goPreviousView()));
+}
+
+void MasterView::goPatientView()
+{
+    patientView = new PatientView(this);
+    pushWidgetToStackView(patientView);
+
+    connect(patientView, SIGNAL(goPatientEditView(int)), this, SLOT(goPatientEditView(int)));
+}
+
+void MasterView::goPreviousView()
+{
+    int count = ui->stackedWidget->count();
+
+    if (count > 1)
+    {
+        ui->stackedWidget->setCurrentIndex(count - 2);
+        ui->labelTitle->setText(ui->stackedWidget->currentWidget()->windowTitle());
+
+        QWidget *widget = ui->stackedWidget->widget(count - 1);
+        ui->stackedWidget->removeWidget(widget);
+        delete widget;
+    }
+}
+
+void MasterView::pushWidgetToStackView(QWidget *widget)
+{
+    ui->stackedWidget->addWidget(widget);
+
+    int count = ui->stackedWidget->count();
+    ui->stackedWidget->setCurrentIndex(count - 1);
+    ui->labelTitle->setText(widget->windowTitle());
+}
+
+void MasterView::on_btnBack_clicked()
+{
+    goPreviousView();
+}
+
+
+void MasterView::on_stackedWidget_currentChanged(int arg1)
+{
+    int count = ui->stackedWidget->count();
+    if(count > 1){
+        ui->btnBack->setEnabled(true);
+    }
+    else
+        ui->btnBack->setEnabled(false);
+
+    QString title = ui->stackedWidget->currentWidget()->windowTitle();
+
+    if (title == "欢迎")
+    {
+        ui->btnBack->setEnabled(false);
+        ui->btnLogout->setEnabled(true);
+    }
+    else
+    {
+        ui->btnLogout->setEnabled(false);
+    }
+    if (title == "登录")
+    {
+        ui->btnBack->setEnabled(false);
+        ui->btnLogout->setEnabled(false);
+    }
+}
+
+
+void MasterView::on_btnLogout_clicked()
+{
+    goPreviousView();
+}
+
+
+
+masterview
+--------------------------------------------------
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MasterView</class>
+ <widget class="QWidget" name="MasterView">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MasterView</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QPushButton" name="btnBack">
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="res.qrc">
+         <normaloff>:/res/back.png</normaloff>:/res/back.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="labelTitle">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnLogout">
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="res.qrc">
+         <normaloff>:/res/logout.png</normaloff>:/res/logout.png</iconset>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QStackedWidget" name="stackedWidget">
+     <property name="currentIndex">
+      <number>-1</number>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources>
+  <include location="res.qrc"/>
+ </resources>
+ <connections/>
+</ui>
+
+
+patienteditview
+--------------------------------------------------
+#include "patienteditview.h"
+#include "ui_patienteditview.h"
+#include "idatabase.h"
+#include <QSqlTableModel>
+
+
+PatientEditView::PatientEditView(QWidget *parent, int index)
+    : QWidget(parent)
+    , ui(new Ui::PatientEditView)
+{
+    ui->setupUi(this);
+
+    dataMapper = new QDataWidgetMapper();
+    QSqlTableModel *tabModel = IDatabase::getInstance().patientTabModel;
+    dataMapper->setModel(IDatabase::getInstance().patientTabModel);
+    dataMapper->setSubmitPolicy(QDataWidgetMapper::AutoSubmit);
+
+    dataMapper->addMapping(ui->dbEditID, tabModel->fieldIndex("ID"));
+    dataMapper->addMapping(ui->dbEditName, tabModel->fieldIndex("NAME"));
+    dataMapper->addMapping(ui->dbEditIDCard, tabModel->fieldIndex("ID_CARD"));
+    dataMapper->addMapping(ui->dbSpinBoxHeight, tabModel->fieldIndex("HEIGHT"));
+    dataMapper->addMapping(ui->dbSpinBoxWeight, tabModel->fieldIndex("WEIGHT"));
+    dataMapper->addMapping(ui->dbEditPhone, tabModel->fieldIndex("MOBILEPHONE"));
+    dataMapper->addMapping(ui->dbDateEditBirthday, tabModel->fieldIndex("DOB"));
+    dataMapper->addMapping(ui->dbComboSex, tabModel->fieldIndex("SEX"));
+    dataMapper->addMapping(ui->dbEditCreateTime, tabModel->fieldIndex("CREATEDTIMESTAMP"));
+
+    dataMapper->setCurrentIndex(index);
+}
+
+PatientEditView::~PatientEditView()
+{
+    delete ui;
+}
+
+void PatientEditView::on_pushButton_clicked()
+{
+    IDatabase::getInstance().submitPatientEdit();
+
+    emit goPreviousView();
+}
+
+
+void PatientEditView::on_pushButton_2_clicked()
+{
+    IDatabase::getInstance().revertPatientEdit();
+
+    emit goPreviousView();
+}
+
+
+
+patienteditview
+--------------------------------------------------
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>PatientEditView</class>
+ <widget class="QWidget" name="PatientEditView">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>556</width>
+    <height>537</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>添加患者</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <spacer name="horizontalSpacer">
+     <property name="orientation">
+      <enum>Qt::Orientation::Horizontal</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Policy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>52</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="0" column="1">
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_8">
+       <item>
+        <widget class="QLabel" name="label">
+         <property name="minimumSize">
+          <size>
+           <width>100</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>ID：</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="dbEditID">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>113</width>
+           <height>0</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_7">
+       <item>
+        <widget class="QLabel" name="label_2">
+         <property name="minimumSize">
+          <size>
+           <width>100</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>姓名：</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="dbEditName">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>113</width>
+           <height>0</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_6">
+       <item>
+        <widget class="QLabel" name="label_3">
+         <property name="minimumSize">
+          <size>
+           <width>100</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>身份证：</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="dbEditIDCard">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>113</width>
+           <height>0</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_5">
+       <item>
+        <widget class="QLabel" name="label_4">
+         <property name="minimumSize">
+          <size>
+           <width>100</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>性别：</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QComboBox" name="dbComboSex">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>113</width>
+           <height>0</height>
+          </size>
+         </property>
+         <item>
+          <property name="text">
+           <string>男</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>女</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_4">
+       <item>
+        <widget class="QLabel" name="label_5">
+         <property name="minimumSize">
+          <size>
+           <width>100</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>出生日期：</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QDateEdit" name="dbDateEditBirthday">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>113</width>
+           <height>0</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <item>
+        <widget class="QLabel" name="label_6">
+         <property name="minimumSize">
+          <size>
+           <width>100</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>身高：</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QSpinBox" name="dbSpinBoxHeight">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>113</width>
+           <height>0</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <item>
+        <widget class="QLabel" name="label_7">
+         <property name="minimumSize">
+          <size>
+           <width>100</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>体重：</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QSpinBox" name="dbSpinBoxWeight">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>113</width>
+           <height>0</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QLabel" name="label_8">
+         <property name="minimumSize">
+          <size>
+           <width>100</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>手机号：</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="dbEditPhone">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>113</width>
+           <height>0</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_9">
+       <item>
+        <widget class="QLabel" name="label_9">
+         <property name="minimumSize">
+          <size>
+           <width>100</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>创建时间：</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="dbEditCreateTime">
+         <property name="minimumSize">
+          <size>
+           <width>113</width>
+           <height>0</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </item>
+   <item row="0" column="2">
+    <layout class="QVBoxLayout" name="verticalLayout_2">
+     <item>
+      <spacer name="verticalSpacer">
+       <property name="orientation">
+        <enum>Qt::Orientation::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton">
+       <property name="text">
+        <string>保存</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_2">
+       <property name="text">
+        <string>取消</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="0" column="3">
+    <spacer name="horizontalSpacer_2">
+     <property name="orientation">
+      <enum>Qt::Orientation::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>196</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
+
+
+patientview
+--------------------------------------------------
+#include "patientview.h"
+#include "ui_patientview.h"
+#include "idatabase.h"
+
+PatientView::PatientView(QWidget *parent)
+    : QWidget(parent)
+    , ui(new Ui::PatientView)
+{
+    ui->setupUi(this);
+
+    ui->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->tableView->setSelectionMode(QAbstractItemView::SingleSelection);
+    ui->tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui->tableView->setAlternatingRowColors(true);
+
+    IDatabase &iDatabase = IDatabase::getInstance();
+    if (iDatabase.initPatientModel()){
+        ui->tableView->setModel(iDatabase.patientTabModel);
+        ui->tableView->setSelectionModel(iDatabase.thePatientSelection);
+    }
+}
+
+PatientView::~PatientView()
+{
+    delete ui;
+}
+
+void PatientView::on_btnAdd_clicked()
+{
+    int currow = IDatabase::getInstance().addNewPatient();
+    emit goPatientEditView(currow);
+
+}
+
+
+void PatientView::on_btnSearch_clicked()
+{
+    QString filter = QString("name like '%%1%'").arg(ui->txtSearch->text());
+    IDatabase::getInstance().searchPatient(filter);
+}
+
+
+void PatientView::on_addDelete_clicked()
+{
+    IDatabase::getInstance().deleteCurrentPatient();
+}
+
+
+void PatientView::on_btnEdit_clicked()
+{
+    QModelIndex curIndex = IDatabase::getInstance().thePatientSelection->currentIndex();
+
+    emit goPatientEditView(curIndex.row());
+}
+
+
+patientview
+--------------------------------------------------
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>PatientView</class>
+ <widget class="QWidget" name="PatientView">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>786</width>
+    <height>546</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>患者管理</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QLineEdit" name="txtSearch">
+       <property name="placeholderText">
+        <string>请输入姓名进行查找</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnSearch">
+       <property name="text">
+        <string>查找</string>
+       </property>
+       <property name="icon">
+        <iconset theme="QIcon::ThemeIcon::EditFind"/>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnAdd">
+       <property name="text">
+        <string>添加</string>
+       </property>
+       <property name="icon">
+        <iconset theme="QIcon::ThemeIcon::ListAdd"/>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="addDelete">
+       <property name="text">
+        <string>删除</string>
+       </property>
+       <property name="icon">
+        <iconset theme="QIcon::ThemeIcon::EditDelete"/>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnEdit">
+       <property name="text">
+        <string>修改</string>
+       </property>
+       <property name="icon">
+        <iconset theme="QIcon::ThemeIcon::MailMessageNew"/>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="1" column="0">
+    <widget class="QTableView" name="tableView"/>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
+
+
+welcomeview
+--------------------------------------------------
+#include "welcomeview.h"
+#include "ui_welcomeview.h"
+
+WelcomeView::WelcomeView(QWidget *parent)
+    : QWidget(parent)
+    , ui(new Ui::WelcomeView)
+{
+    ui->setupUi(this);
+}
+
+WelcomeView::~WelcomeView()
+{
+    delete ui;
+}
+
+void WelcomeView::on_btnDepartment_clicked()
+{
+    emit goDepartmentView();
+}
+
+
+void WelcomeView::on_btnDoctor_clicked()
+{
+    emit goDoctorView();
+}
+
+
+void WelcomeView::on_btnPatient_clicked()
+{
+    emit goPatientView();
+}
+
+
+
+welcomeview
+--------------------------------------------------
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>WelcomeView</class>
+ <widget class="QWidget" name="WelcomeView">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>546</width>
+    <height>396</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>欢迎</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Orientation::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>139</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="1" column="0">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <spacer name="horizontalSpacer_3">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnDepartment">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>80</width>
+         <height>80</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>科室管理</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnDoctor">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>80</width>
+         <height>80</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>医生管理</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnPatient">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>80</width>
+         <height>80</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>患者管理</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_4">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+   <item row="2" column="0">
+    <spacer name="verticalSpacer_2">
+     <property name="orientation">
+      <enum>Qt::Orientation::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>139</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
+
+

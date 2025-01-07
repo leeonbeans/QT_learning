@@ -9,9 +9,9 @@ void IDatabase::initDatabase()
     database.setDatabaseName(aFile);
 
     if(!database.open()){
-
+        qDebug()<<"数据库异常";
     }else{
-        qDebug()<<"xxx";
+
     }
 }
 
@@ -54,6 +54,28 @@ int IDatabase::addNewPatient()
     return curIndex.row();
 }
 
+QString IDatabase::doctorLogin(const QString &username, const QString &password)
+{
+    QSqlQuery query;
+    query.prepare("SELECT username, password FROM doctor WHERE username = :username");
+    query.bindValue(":username", username);
+    if (!query.exec()) {
+        qDebug() << "Login query failed:" << query.lastError();
+        return "loginFail";
+    }
+
+    if (query.next()) {
+        QString storedPassword = query.value("password").toString();
+        if (storedPassword == password) {
+            return "loginOK";
+        } else {
+            return "wrongPassword";
+        }
+    } else {
+        return "loginFail";
+    }
+}
+
 bool IDatabase::initPatientModel()
 {
     patientTabModel = new QSqlTableModel(this, database);
@@ -80,7 +102,6 @@ QString IDatabase::userLogin(QString username, QString password)
             return "loginOK";
         }
         else{
-            qDebug()<<"sadasd";
             return "wrongPassword";
         }
     }
@@ -93,4 +114,49 @@ QString IDatabase::userLogin(QString username, QString password)
 IDatabase::IDatabase(QObject *parent): QObject{parent}
 {
     initDatabase();
+}
+
+bool IDatabase::initDoctorModel() {
+    doctorTabModel = new QSqlTableModel(this, database);
+    doctorTabModel->setTable("doctor");
+    doctorTabModel->setEditStrategy(QSqlTableModel::OnManualSubmit);
+    doctorTabModel->setSort(doctorTabModel->fieldIndex("name"), Qt::AscendingOrder);
+    if (!doctorTabModel->select()) {
+        qDebug() << "Failed to initialize doctor model:" << doctorTabModel->lastError();
+        return false;
+    }
+
+    theDoctorSelection = new QItemSelectionModel(doctorTabModel);
+    return true;
+}
+
+bool IDatabase::addNewDoctor() {
+    int row = doctorTabModel->rowCount();
+    if (!doctorTabModel->insertRow(row)) {
+        qDebug() << "Failed to add new doctor:" << doctorTabModel->lastError();
+        return false;
+    }
+    return true;
+}
+
+bool IDatabase::deleteCurrentDoctor() {
+    QModelIndex currentIndex = theDoctorSelection->currentIndex();
+    if (!doctorTabModel->removeRow(currentIndex.row())) {
+        qDebug() << "Failed to delete doctor:" << doctorTabModel->lastError();
+        return false;
+    }
+    return doctorTabModel->submitAll();
+}
+
+bool IDatabase::searchDoctor(const QString &filter) {
+    doctorTabModel->setFilter(filter);
+    return doctorTabModel->select();
+}
+
+bool IDatabase::submitDoctorEdit() {
+    return doctorTabModel->submitAll();
+}
+
+void IDatabase::revertDoctorEdit() {
+    doctorTabModel->revertAll();
 }

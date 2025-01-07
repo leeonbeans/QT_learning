@@ -30,3 +30,7 @@ void WelcomeView::on_btnPatient_clicked()
     emit goPatientView();
 }
 
+void WelcomeView::hideAdminButtons() {
+    ui->btnDepartment->setVisible(false);
+    ui->btnDoctor->setVisible(false);
+}
