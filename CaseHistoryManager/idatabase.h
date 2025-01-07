@@ -49,6 +49,16 @@ public:
     QSqlTableModel *medicineTabModel;  // 药品信息模型
     QItemSelectionModel *theMedicineSelection;  // 药品选择模型
 
+    bool initAppointmentModel();  // 初始化就诊记录模型
+    int addNewAppointment();     // 添加新就诊记录
+    bool deleteCurrentAppointment();  // 删除当前就诊记录
+    bool searchAppointment(const QString &filter);  // 查询就诊记录
+    bool submitAppointmentEdit();  // 提交就诊记录修改
+    void revertAppointmentEdit();  // 撤销就诊记录修改
+
+    QSqlTableModel *appointmentTabModel;  // 就诊记录模型
+    QItemSelectionModel *theAppointmentSelection;  // 就诊记录选择模型
+
 private:
 
     explicit IDatabase(QObject *parent = nullptr);

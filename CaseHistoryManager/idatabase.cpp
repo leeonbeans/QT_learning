@@ -199,3 +199,45 @@ bool IDatabase::submitMedicineEdit() {
 void IDatabase::revertMedicineEdit() {
     medicineTabModel->revertAll();
 }
+
+bool IDatabase::initAppointmentModel() {
+    appointmentTabModel = new QSqlTableModel(this, database);
+    appointmentTabModel->setTable("appointment");
+    appointmentTabModel->setEditStrategy(QSqlTableModel::OnManualSubmit);
+    appointmentTabModel->setSort(appointmentTabModel->fieldIndex("patient_name"), Qt::AscendingOrder);
+    if (!appointmentTabModel->select()) {
+        qDebug() << "Failed to initialize appointment model:" << appointmentTabModel->lastError();
+        return false;
+    }
+
+    theAppointmentSelection = new QItemSelectionModel(appointmentTabModel);
+    return true;
+}
+
+int IDatabase::addNewAppointment() {
+    appointmentTabModel->insertRow(appointmentTabModel->rowCount(),QModelIndex());
+    QModelIndex curIndex = appointmentTabModel->index(appointmentTabModel->rowCount()-1,1);
+    return curIndex.row();
+}
+
+bool IDatabase::deleteCurrentAppointment() {
+    QModelIndex currentIndex = theAppointmentSelection->currentIndex();
+    if (!appointmentTabModel->removeRow(currentIndex.row())) {
+        qDebug() << "Failed to delete appointment:" << appointmentTabModel->lastError();
+        return false;
+    }
+    return appointmentTabModel->submitAll();
+}
+
+bool IDatabase::searchAppointment(const QString &filter) {
+    appointmentTabModel->setFilter(filter);
+    return appointmentTabModel->select();
+}
+
+bool IDatabase::submitAppointmentEdit() {
+    return appointmentTabModel->submitAll();
+}
+
+void IDatabase::revertAppointmentEdit() {
+    appointmentTabModel->revertAll();
+}

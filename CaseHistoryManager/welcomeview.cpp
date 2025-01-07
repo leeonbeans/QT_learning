@@ -15,7 +15,7 @@ WelcomeView::~WelcomeView()
 
 void WelcomeView::on_btnDepartment_clicked()
 {
-    emit goDepartmentView();
+    //
 }
 
 
@@ -31,12 +31,17 @@ void WelcomeView::on_btnPatient_clicked()
 }
 
 void WelcomeView::hideAdminButtons() {
-    ui->btnDepartment->setVisible(false);
     ui->btnDoctor->setVisible(false);
 }
 
 void WelcomeView::on_btnMedicine_clicked()
 {
     emit goMedicineView();
+}
+
+
+void WelcomeView::on_btnAppointment_clicked()
+{
+    emit goAppointmentView();
 }
 

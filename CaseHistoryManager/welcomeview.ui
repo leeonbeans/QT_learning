@@ -43,7 +43,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="btnDepartment">
+      <widget class="QPushButton" name="btnAppointment">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -57,7 +57,7 @@
         </size>
        </property>
        <property name="text">
-        <string>科室管理</string>
+        <string>就诊管理</string>
        </property>
       </widget>
      </item>

@@ -25,8 +25,10 @@ private slots:
 
     void on_btnMedicine_clicked();
 
+    void on_btnAppointment_clicked();
+
 signals:
-    void goDepartmentView();
+    void goAppointmentView();
     void goDoctorView();
     void goPatientView();
     void goMedicineView();

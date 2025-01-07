@@ -41,7 +41,7 @@ void MasterView::goWelcomeView(const QString &role)
         welcomeView->hideAdminButtons();  // 隐藏管理员按钮
     }
 
-    connect(welcomeView, SIGNAL(goDepartmentView()), this, SLOT(goDepartmentView()));
+    connect(welcomeView, SIGNAL(goAppointmentView()), this, SLOT(goAppointmentView()));
     connect(welcomeView, SIGNAL(goDoctorView()), this, SLOT(goDoctorView()));
     connect(welcomeView, SIGNAL(goPatientView()), this, SLOT(goPatientView()));
     connect(welcomeView, SIGNAL(goMedicineView()), this, SLOT(goMedicineView()));
@@ -111,6 +111,21 @@ void MasterView::goMedicineEditView(int rowNo)
     medicineEditView = new MedicineEditView(this, rowNo);
     pushWidgetToStackView(medicineEditView);
     connect(medicineEditView,SIGNAL(goPreviousView()),this,SLOT(goPreviousView()));
+}
+
+void MasterView::goAppointmentView()
+{
+    appointmentView = new AppointmentView(this);
+    pushWidgetToStackView(appointmentView);
+
+    connect(appointmentView, SIGNAL(goAppointmentEditView(int)), this, SLOT(goAppointmentEditView(int)));
+}
+
+void MasterView::goAppointmentEditView(int rowNo)
+{
+    appointmentEditView = new AppointmentEditView(this, rowNo);
+    pushWidgetToStackView(appointmentEditView);
+    connect(appointmentEditView,SIGNAL(goPreviousView()),this,SLOT(goPreviousView()));
 }
 
 void MasterView::pushWidgetToStackView(QWidget *widget)

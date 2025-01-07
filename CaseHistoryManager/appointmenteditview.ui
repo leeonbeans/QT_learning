@@ -1,50 +1,70 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MedicineEditView</class>
- <widget class="QWidget" name="MedicineEditView">
+ <class>AppointmentEditView</class>
+ <widget class="QWidget" name="AppointmentEditView">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>300</height>
+    <height>400</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>编辑药品信息</string>
+   <string>编辑就诊记录</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <layout class="QFormLayout" name="formLayout">
      <item row="0" column="0">
-      <widget class="QLabel" name="labelName">
+      <widget class="QLabel" name="labelPatientName">
        <property name="text">
-        <string>药品名称：</string>
+        <string>病人姓名：</string>
        </property>
       </widget>
      </item>
      <item row="0" column="1">
-      <widget class="QLineEdit" name="txtName"/>
+      <widget class="QLineEdit" name="txtPatientName"/>
      </item>
      <item row="1" column="0">
-      <widget class="QLabel" name="labelDosage">
+      <widget class="QLabel" name="labelDoctorName">
        <property name="text">
-        <string>剂量：</string>
+        <string>医生姓名：</string>
        </property>
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QLineEdit" name="txtDosage"/>
+      <widget class="QLineEdit" name="txtDoctorName"/>
      </item>
      <item row="2" column="0">
-      <widget class="QLabel" name="labelStock">
+      <widget class="QLabel" name="labelAppointmentDate">
        <property name="text">
-        <string>库存数量：</string>
+        <string>就诊日期：</string>
        </property>
       </widget>
      </item>
      <item row="2" column="1">
-      <widget class="QSpinBox" name="spinStock"/>
+      <widget class="QDateEdit" name="dateEdit"/>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="labelDiagnosis">
+       <property name="text">
+        <string>诊断结果：</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QLineEdit" name="txtDiagnosis"/>
+     </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="labelMedication">
+       <property name="text">
+        <string>开具药品：</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="QLineEdit" name="txtMedication"/>
      </item>
     </layout>
    </item>
