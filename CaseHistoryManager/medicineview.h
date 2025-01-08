@@ -27,6 +27,10 @@ private slots:
 
     void on_btnSearch_clicked();
 
+    void on_btnCheckStock_clicked();
+
+    void on_btnExport_clicked();
+
 private:
     Ui::MedicineView *ui;
 };

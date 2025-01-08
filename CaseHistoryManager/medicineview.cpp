@@ -2,6 +2,7 @@
 #include "ui_medicineview.h"
 #include <idatabase.h>
 #include <QMessageBox>
+#include <QFileDialog>
 
 MedicineView::MedicineView(QWidget *parent) : QWidget(parent), ui(new Ui::MedicineView) {
     ui->setupUi(this);
@@ -58,5 +59,59 @@ void MedicineView::on_btnSearch_clicked()
     } else {
         QMessageBox::warning(this, "错误", "查询失败");
     }
+}
+
+
+void MedicineView::on_btnCheckStock_clicked()
+{
+    QSqlTableModel *model = IDatabase::getInstance().medicineTabModel;
+    bool hasLowStock = false;
+
+    for (int row = 0; row < model->rowCount(); ++row) {
+        int stock = model->data(model->index(row, model->fieldIndex("stock"))).toInt();
+        if (stock < 10) {  // 假设库存低于10时触发警告
+            QString medicineName = model->data(model->index(row, model->fieldIndex("name"))).toString();
+            QMessageBox::warning(this, "库存警告", QString("药品【%1】库存不足，当前库存：%2").arg(medicineName).arg(stock));
+            hasLowStock = true;
+        }
+    }
+
+    if (!hasLowStock) {
+        QMessageBox::information(this, "库存检查", "所有药品库存充足");
+    }
+}
+
+
+void MedicineView::on_btnExport_clicked()
+{
+    // 打开文件对话框，选择保存路径
+    QString fileName = QFileDialog::getSaveFileName(this, "导出药品信息", "药品记录", "CSV文件 (*.csv)");
+    if (fileName.isEmpty()) {
+        return;  // 用户取消导出
+    }
+
+    QFile file(fileName);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QMessageBox::warning(this, "错误", "无法打开文件");
+        return;
+    }
+
+    QTextStream out(&file);
+    out.setEncoding(QStringEncoder::Utf8);  // 指定编码为UTF-8
+    out.setGenerateByteOrderMark(true);  // 添加BOM头
+
+    // 写入表头
+    out << "药品名称,剂量,库存数量\n";
+
+    // 遍历所有药品信息并写入文件
+    QSqlTableModel *model = IDatabase::getInstance().medicineTabModel;
+    for (int row = 0; row < model->rowCount(); ++row) {
+        out << model->data(model->index(row, model->fieldIndex("name"))).toString() << ","
+            << model->data(model->index(row, model->fieldIndex("dosage"))).toString() << ","
+            << model->data(model->index(row, model->fieldIndex("stock"))).toString() << "\n";
+    }
+
+    file.close();
+    QMessageBox::information(this, "成功", "药品信息已导出到：" + fileName);
 }
 

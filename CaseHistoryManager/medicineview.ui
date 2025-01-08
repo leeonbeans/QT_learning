@@ -51,6 +51,20 @@
        </property>
       </widget>
      </item>
+     <item>
+      <widget class="QPushButton" name="btnExport">
+       <property name="text">
+        <string>导出</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnCheckStock">
+       <property name="text">
+        <string>检查库存</string>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item>

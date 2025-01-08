@@ -2,6 +2,8 @@
 #include "ui_appointmentview.h"
 #include "idatabase.h"
 #include <QMessageBox>
+#include <QFileDialog>
+#include <QTextStream>
 
 AppointmentView::AppointmentView(QWidget *parent) : QWidget(parent), ui(new Ui::AppointmentView) {
     ui->setupUi(this);
@@ -56,3 +58,39 @@ void AppointmentView::on_btnSearch_clicked() {
         QMessageBox::warning(this, "错误", "查询失败");
     }
 }
+
+void AppointmentView::on_btnExport_clicked()
+{
+    // 打开文件对话框，选择保存路径
+    QString fileName = QFileDialog::getSaveFileName(this, "导出就诊记录", "就诊记录", "CSV文件 (*.csv)");
+    if (fileName.isEmpty()) {
+        return;  // 用户取消导出
+    }
+
+    QFile file(fileName);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QMessageBox::warning(this, "错误", "无法打开文件");
+        return;
+    }
+
+    QTextStream out(&file);
+    out.setEncoding(QStringEncoder::Utf8);  // 指定编码为UTF-8
+    out.setGenerateByteOrderMark(true);  // 添加BOM头
+
+    // 写入表头
+    out << "病人姓名,医生姓名,就诊日期,诊断结果,开具药品\n";
+
+    // 遍历所有就诊记录并写入文件
+    QSqlTableModel *model = IDatabase::getInstance().appointmentTabModel;
+    for (int row = 0; row < model->rowCount(); ++row) {
+        out << model->data(model->index(row, model->fieldIndex("patient_name"))).toString() << ","
+            << model->data(model->index(row, model->fieldIndex("doctor_name"))).toString() << ","
+            << model->data(model->index(row, model->fieldIndex("appointment_date"))).toString() << ","
+            << model->data(model->index(row, model->fieldIndex("diagnosis"))).toString() << ","
+            << model->data(model->index(row, model->fieldIndex("medication"))).toString() << "\n";
+    }
+
+    file.close();
+    QMessageBox::information(this, "成功", "就诊记录已导出到：" + fileName);
+}
+
