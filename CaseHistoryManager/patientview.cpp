@@ -14,12 +14,15 @@ PatientView::PatientView(QWidget *parent)
     ui->tableView->setSelectionMode(QAbstractItemView::SingleSelection);
     ui->tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->tableView->setAlternatingRowColors(true);
+    ui->tableView->setSortingEnabled(true);
 
     IDatabase &iDatabase = IDatabase::getInstance();
     if (iDatabase.initPatientModel()){
         ui->tableView->setModel(iDatabase.patientTabModel);
         ui->tableView->setSelectionModel(iDatabase.thePatientSelection);
     }
+
+    updatePage();
 }
 
 PatientView::~PatientView()
@@ -158,5 +161,44 @@ void PatientView::on_btnImport_clicked() {
         QMessageBox::information(this, "成功", QString("病人数据已导入\n成功导入记录：%1").arg(successCount));
     } else {
         QMessageBox::warning(this, "错误", "导入病人数据失败");
+    }
+}
+
+void PatientView::updatePage() {
+    // 计算总页数
+    QSqlQuery query;
+    query.exec("SELECT COUNT(*) FROM patient");
+    if (query.next()) {
+        int totalRecords = query.value(0).toInt();
+        totalPages = (totalRecords + pageSize - 1) / pageSize;  // 向上取整
+    }
+
+    // 更新页面信息
+    ui->labelPageInfo->setText(QString("第 %1 页 / 共 %2 页").arg(currentPage).arg(totalPages));
+
+    // 加载当前页的数据
+    int offset = (currentPage - 1) * pageSize;
+    QString queryStr = QString("SELECT * FROM patient LIMIT %1 OFFSET %2").arg(pageSize).arg(offset);
+    IDatabase::getInstance().patientTabModel->setQuery(queryStr);
+
+    // 刷新表格
+    ui->tableView->setModel(IDatabase::getInstance().patientTabModel);
+}
+
+void PatientView::on_btnPrevPage_clicked() {
+    if (currentPage > 1) {
+        currentPage--;
+        updatePage();
+    } else {
+        QMessageBox::information(this, "提示", "已经是第一页");
+    }
+}
+
+void PatientView::on_btnNextPage_clicked() {
+    if (currentPage < totalPages) {
+        currentPage++;
+        updatePage();
+    } else {
+        QMessageBox::information(this, "提示", "已经是最后一页");
     }
 }

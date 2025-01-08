@@ -18,6 +18,7 @@ MedicineView::MedicineView(QWidget *parent) : QWidget(parent), ui(new Ui::Medici
     ui->tableView->setSelectionMode(QAbstractItemView::SingleSelection);
     ui->tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->tableView->setAlternatingRowColors(true);
+    ui->tableView->setSortingEnabled(true);
 }
 
 MedicineView::~MedicineView()

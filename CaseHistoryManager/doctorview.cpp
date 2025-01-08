@@ -18,6 +18,7 @@ DoctorView::DoctorView(QWidget *parent) : QWidget(parent), ui(new Ui::DoctorView
     ui->tableView->setSelectionMode(QAbstractItemView::SingleSelection);
     ui->tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->tableView->setAlternatingRowColors(true);
+    ui->tableView->setSortingEnabled(true);
 }
 
 DoctorView::~DoctorView()

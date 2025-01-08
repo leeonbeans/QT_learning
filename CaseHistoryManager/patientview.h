@@ -28,11 +28,20 @@ private slots:
 
     void on_btnImport_clicked();
 
+    void on_btnPrevPage_clicked();
+
+    void on_btnNextPage_clicked();
+
 signals:
     void goPatientEditView(int idx);
 
 private:
     Ui::PatientView *ui;
+    int currentPage = 1;  // 当前页码
+    int pageSize = 10;    // 每页显示的记录数
+    int totalPages = 1;   // 总页数
+
+    void updatePage();    // 更新分页数据
 };
 
 #endif // PATIENTVIEW_H
