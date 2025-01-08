@@ -28,6 +28,10 @@ private slots:
 
     void on_btnSearch_clicked();
 
+    void on_btnExport_clicked();
+
+    void on_btnImport_clicked();
+
 signals:
     void goDoctorEditView(int idx);
 };

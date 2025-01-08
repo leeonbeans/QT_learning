@@ -1,95 +1,458 @@
-
+appointmenteditview
 --------------------------------------------------
-import os
-import chardet
-import time
+#include "appointmenteditview.h"
+#include "ui_appointmenteditview.h"
+#include "idatabase.h"
+#include <QMessageBox>
 
-def merge_files(folder_path, output_file):
-    """
-    将文件夹中的所有代码文件内容合并到一个txt文件中
-    :param folder_path: 文件夹路径
-    :param output_file: 输出txt文件名
-    :return: 写入文件数量
-    """
-    count = 0  #记录写入的文件数量
-    # 测试能否写入文件权限
-    try:
-        with open(output_file, mode='w', encoding='utf-8') as f:
-            pass
-    except Exception as e:
-        print(f"Error: {e}")
-    # 如果文件不存在，则创建一个
-    if not os.path.exists(output_file):
-        open(output_file, 'w').close()
-    # 增加写入权限
-    os.chmod(output_file, 0o777)
-    # 打开或新建txt文件
-    with open(output_file, mode='w+', encoding='utf-8') as out_file:
-        # 获取文件夹中的文件列表
-        file_list = os.listdir(folder_path)
-        # 按照名称排序
-        file_list.sort()
-        for f in file_list:
-            # 获取文件路径
-            file_path = os.path.join(folder_path, f)
-            
-            # 如果是文件夹，则递归处理
-            if os.path.isdir(file_path):
-                #count += merge_files(file_path, output_file)
-                pass
-            # 如果是代码文件，则添加到txt中（此处如果有其他类型的文件也可以修改）
-            elif f.endswith('.py') or f.endswith('.cpp') or f.endswith('.c') or f.endswith('.java') or f.endswith('.json')or f.endswith('.ui'):
-                print(f"正在处理文件：{file_path}")
-                # 获取文件名
-                filename = os.path.splitext(f)[0]
-                # 读取文件内容
-                try:
-                    with open(file_path, mode='r', encoding='utf-8') as code_file:
-                        content = code_file.read()
-                        # print(content)
-                except UnicodeDecodeError as e:
-                    encoding = chardet.detect(open(file_path, 'rb').read())['encoding'] # 获取文件编码方式
-                    print(f"Error: {e}, skip {file_path}")
-                    # 尝试使用文件编码方式再次读取文件
-                    try:
-                        with open(file_path, mode='r', encoding=encoding) as code_file:
-                            content = code_file.read()
-                            # 将*替换掉无法解析的中文
-                            content = content.replace("\uFFFD", "*")
-                            # print(content)
-                    except Exception as e1:
-                        print(f"Error: {e1}, skip {file_path}")
-                        continue
-                #缓冲
-                out_file.flush()
-                # 添加文件名和分隔符到txt中
-                out_file.write(f"{filename}\n{'-'*50}\n")
-                # 将代码添加到txt中
-                content = content.replace('\t', ' ' * 4)  # 将制表符替换为四个空格
-                # print(content)
-                out_file.write(f"{content}\n\n")
-                # 使用缓冲区和sleep保证所有内容能够写入文件
-                os.fsync(out_file)  
-                count += 1
-                
-        
-        time.sleep(0.1)
-    return count
-   
+AppointmentEditView::AppointmentEditView(QWidget *parent, int index) : QWidget(parent), ui(new Ui::AppointmentEditView) {
+    ui->setupUi(this);
 
-if __name__ == '__main__':
-    if os.getpid() == 0:
-        print("当前程序以系统权限运行")
-    else:
-        print("当前程序未以系统权限运行")
-    # 设置输入文件夹路径（注意使用原始字符串）
-    folder_path = r'D:\Qt\QT_learning\CaseHistoryManager'
-    # 设置输出txt文件名
-    output_file = 'output.txt'
-    # 合并文件
-    count = merge_files(folder_path, output_file)
-    print(f"共写入 {count} 个文件。")
+    dataMapper = new QDataWidgetMapper();
+    dataMapper->setModel(IDatabase::getInstance().appointmentTabModel);
+    dataMapper->setSubmitPolicy(QDataWidgetMapper::AutoSubmit);
 
+    // 绑定控件到数据库字段
+    dataMapper->addMapping(ui->txtPatientName, IDatabase::getInstance().appointmentTabModel->fieldIndex("patient_name"));
+    dataMapper->addMapping(ui->txtDoctorName, IDatabase::getInstance().appointmentTabModel->fieldIndex("doctor_name"));
+    dataMapper->addMapping(ui->dateEdit, IDatabase::getInstance().appointmentTabModel->fieldIndex("appointment_date"));
+    dataMapper->addMapping(ui->txtDiagnosis, IDatabase::getInstance().appointmentTabModel->fieldIndex("diagnosis"));
+    dataMapper->addMapping(ui->txtMedication, IDatabase::getInstance().appointmentTabModel->fieldIndex("medication"));
+
+    dataMapper->setCurrentIndex(index);
+}
+
+void AppointmentEditView::on_btnSave_clicked() {
+    if (IDatabase::getInstance().submitAppointmentEdit()) {
+        QMessageBox::information(this, "成功", "就诊记录已保存");
+        emit goPreviousView();
+    } else {
+        QMessageBox::warning(this, "错误", "保存就诊记录失败");
+    }
+}
+
+void AppointmentEditView::on_btnCancel_clicked() {
+    IDatabase::getInstance().revertAppointmentEdit();
+    emit goPreviousView();
+}
+
+AppointmentEditView::~AppointmentEditView()
+{
+    delete ui;
+}
+
+
+appointmenteditview
+--------------------------------------------------
+#ifndef APPOINTMENTEDITVIEW_H
+#define APPOINTMENTEDITVIEW_H
+
+#include <QWidget>
+#include <QDataWidgetMapper>
+
+namespace Ui {
+class AppointmentEditView;
+}
+
+class AppointmentEditView : public QWidget
+{
+    Q_OBJECT
+
+public:
+    explicit AppointmentEditView(QWidget *parent, int index);
+    ~AppointmentEditView();
+
+signals:
+    void goPreviousView();
+
+private slots:
+    void on_btnSave_clicked();
+
+    void on_btnCancel_clicked();
+
+private:
+    Ui::AppointmentEditView *ui;
+    QDataWidgetMapper *dataMapper;
+};
+
+#endif // APPOINTMENTEDITVIEW_H
+
+
+appointmenteditview
+--------------------------------------------------
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>AppointmentEditView</class>
+ <widget class="QWidget" name="AppointmentEditView">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>400</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>编辑就诊记录</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QFormLayout" name="formLayout">
+     <item row="0" column="0">
+      <widget class="QLabel" name="labelPatientName">
+       <property name="text">
+        <string>病人姓名：</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLineEdit" name="txtPatientName"/>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="labelDoctorName">
+       <property name="text">
+        <string>医生姓名：</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLineEdit" name="txtDoctorName"/>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="labelAppointmentDate">
+       <property name="text">
+        <string>就诊日期：</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QDateEdit" name="dateEdit"/>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="labelDiagnosis">
+       <property name="text">
+        <string>诊断结果：</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QLineEdit" name="txtDiagnosis"/>
+     </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="labelMedication">
+       <property name="text">
+        <string>开具药品：</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="QLineEdit" name="txtMedication"/>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QPushButton" name="btnSave">
+       <property name="text">
+        <string>保存</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnCancel">
+       <property name="text">
+        <string>取消</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
+
+appointmentview
+--------------------------------------------------
+#include "appointmentview.h"
+#include "ui_appointmentview.h"
+#include "idatabase.h"
+#include <QMessageBox>
+#include <QFileDialog>
+#include <QTextStream>
+
+AppointmentView::AppointmentView(QWidget *parent) : QWidget(parent), ui(new Ui::AppointmentView) {
+    ui->setupUi(this);
+
+    // 初始化就诊记录模型
+    if (IDatabase::getInstance().initAppointmentModel()) {
+        ui->tableView->setModel(IDatabase::getInstance().appointmentTabModel);
+        ui->tableView->setSelectionModel(IDatabase::getInstance().theAppointmentSelection);
+    }
+
+    // 设置表格属性
+    ui->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->tableView->setSelectionMode(QAbstractItemView::SingleSelection);
+    ui->tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui->tableView->setAlternatingRowColors(true);
+}
+
+AppointmentView::~AppointmentView()
+{
+    delete ui;
+}
+
+void AppointmentView::on_btnAdd_clicked()
+{
+    int currow = IDatabase::getInstance().addNewAppointment();
+    emit goAppointmentEditView(currow);  // 跳转到编辑界面
+}
+
+
+void AppointmentView::on_btnEdit_clicked()
+{
+    QModelIndex curIndex = IDatabase::getInstance().theAppointmentSelection->currentIndex();
+    emit goAppointmentEditView(curIndex.row());  // 跳转到编辑界面
+}
+
+
+void AppointmentView::on_btnDelete_clicked()
+{
+    if (IDatabase::getInstance().deleteCurrentAppointment()) {
+        QMessageBox::information(this, "成功", "就诊记录已删除");
+    } else {
+        QMessageBox::warning(this, "错误", "删除就诊记录失败");
+    }
+}
+
+
+void AppointmentView::on_btnSearch_clicked() {
+    QString filter = QString("patient_name LIKE '%%1%'").arg(ui->txtSearch->text());
+    if (IDatabase::getInstance().searchAppointment(filter)) {
+        QMessageBox::information(this, "成功", "查询完成");
+    } else {
+        QMessageBox::warning(this, "错误", "查询失败");
+    }
+}
+
+void AppointmentView::on_btnExport_clicked()
+{
+    // 打开文件对话框，选择保存路径
+    QString fileName = QFileDialog::getSaveFileName(this, "导出就诊记录", "就诊记录", "CSV文件 (*.csv)");
+    if (fileName.isEmpty()) {
+        return;  // 用户取消导出
+    }
+
+    QFile file(fileName);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QMessageBox::warning(this, "错误", "无法打开文件");
+        return;
+    }
+
+    QTextStream out(&file);
+    out.setEncoding(QStringEncoder::Utf8);  // 指定编码为UTF-8
+    out.setGenerateByteOrderMark(true);  // 添加BOM头
+
+    // 写入表头
+    out << "病人姓名,医生姓名,就诊日期,诊断结果,开具药品\n";
+
+    // 遍历所有就诊记录并写入文件
+    QSqlTableModel *model = IDatabase::getInstance().appointmentTabModel;
+    for (int row = 0; row < model->rowCount(); ++row) {
+        out << model->data(model->index(row, model->fieldIndex("patient_name"))).toString() << ","
+            << model->data(model->index(row, model->fieldIndex("doctor_name"))).toString() << ","
+            << model->data(model->index(row, model->fieldIndex("appointment_date"))).toString() << ","
+            << model->data(model->index(row, model->fieldIndex("diagnosis"))).toString() << ","
+            << model->data(model->index(row, model->fieldIndex("medication"))).toString() << "\n";
+    }
+
+    file.close();
+    QMessageBox::information(this, "成功", "就诊记录已导出到：" + fileName);
+}
+
+
+void AppointmentView::on_btnImport_clicked()
+{
+    // 打开文件对话框，选择CSV文件
+    QString fileName = QFileDialog::getOpenFileName(this, "导入就诊记录", "", "CSV文件 (*.csv)");
+    if (fileName.isEmpty()) {
+        return;  // 用户取消导入
+    }
+
+    QFile file(fileName);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QMessageBox::warning(this, "错误", "无法打开文件");
+        return;
+    }
+
+    QTextStream in(&file);
+    in.setEncoding(QStringEncoder::Utf8);  // 指定编码为UTF-8
+
+    // 读取表头（跳过第一行）
+    QString header = in.readLine();
+
+    // 逐行读取数据并插入数据库
+    QSqlTableModel *model = IDatabase::getInstance().appointmentTabModel;
+    int successCount = 0;  // 成功导入的记录数
+
+    while (!in.atEnd()) {
+        QString line = in.readLine();
+        QStringList fields = line.split(",");
+
+        if (fields.size() < 5) {
+            QMessageBox::warning(this, "错误", "文件格式不正确");
+            return;
+        }
+
+        // 插入新行
+        int row = model->rowCount();
+        model->insertRow(row);
+
+        // 设置数据
+        model->setData(model->index(row, model->fieldIndex("patient_name")), fields[0].trimmed());
+        model->setData(model->index(row, model->fieldIndex("doctor_name")), fields[1].trimmed());
+        model->setData(model->index(row, model->fieldIndex("appointment_date")), fields[2].trimmed());
+        model->setData(model->index(row, model->fieldIndex("diagnosis")), fields[3].trimmed());
+        model->setData(model->index(row, model->fieldIndex("medication")), fields[4].trimmed());
+
+        successCount++;
+    }
+
+    file.close();
+
+    // 提交修改
+    if (model->submitAll()) {
+        QMessageBox::information(this, "成功", QString("就诊记录已导入\n成功导入记录：%1").arg(successCount));
+    } else {
+        QMessageBox::warning(this, "错误", "导入就诊记录失败");
+    }
+}
+
+
+
+appointmentview
+--------------------------------------------------
+#ifndef APPOINTMENTVIEW_H
+#define APPOINTMENTVIEW_H
+
+#include <QWidget>
+
+namespace Ui {
+class AppointmentView;
+}
+
+class AppointmentView : public QWidget
+{
+    Q_OBJECT
+
+public:
+    explicit AppointmentView(QWidget *parent = nullptr);
+    ~AppointmentView();
+
+signals:
+    void goAppointmentEditView(int idx);
+
+private slots:
+    void on_btnAdd_clicked();
+
+    void on_btnEdit_clicked();
+
+    void on_btnDelete_clicked();
+
+    void on_btnSearch_clicked();
+
+    void on_btnExport_clicked();
+
+    void on_btnImport_clicked();
+
+private:
+    Ui::AppointmentView *ui;
+};
+
+#endif // APPOINTMENTVIEW_H
+
+
+appointmentview
+--------------------------------------------------
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>AppointmentView</class>
+ <widget class="QWidget" name="AppointmentView">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>就诊记录管理</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QLineEdit" name="txtSearch">
+       <property name="placeholderText">
+        <string>请输入病人姓名进行查找</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnSearch">
+       <property name="text">
+        <string>查找</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnAdd">
+       <property name="text">
+        <string>添加</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnEdit">
+       <property name="text">
+        <string>修改</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnDelete">
+       <property name="text">
+        <string>删除</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnExport">
+       <property name="text">
+        <string>导出</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnImport">
+       <property name="text">
+        <string>导入</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QTableView" name="tableView"/>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
 
 departmentview
 --------------------------------------------------
@@ -107,6 +470,32 @@ DepartmentView::~DepartmentView()
 {
     delete ui;
 }
+
+
+departmentview
+--------------------------------------------------
+#ifndef DEPARTMENTVIEW_H
+#define DEPARTMENTVIEW_H
+
+#include <QWidget>
+
+namespace Ui {
+class DepartmentView;
+}
+
+class DepartmentView : public QWidget
+{
+    Q_OBJECT
+
+public:
+    explicit DepartmentView(QWidget *parent = nullptr);
+    ~DepartmentView();
+
+private:
+    Ui::DepartmentView *ui;
+};
+
+#endif // DEPARTMENTVIEW_H
 
 
 departmentview
@@ -132,22 +521,319 @@ departmentview
 </ui>
 
 
+doctoreditview
+--------------------------------------------------
+#include "doctoreditview.h"
+#include "ui_doctoreditview.h"
+#include "idatabase.h"
+#include <QMessageBox>
+
+DoctorEditView::DoctorEditView(QWidget *parent, int index) : QWidget(parent), ui(new Ui::DoctorEditView) {
+    ui->setupUi(this);
+
+    dataMapper = new QDataWidgetMapper();
+    dataMapper->setModel(IDatabase::getInstance().doctorTabModel);
+    dataMapper->setSubmitPolicy(QDataWidgetMapper::AutoSubmit);
+
+    // 绑定控件到数据库字段
+    dataMapper->addMapping(ui->txtUsername, IDatabase::getInstance().doctorTabModel->fieldIndex("username"));
+    dataMapper->addMapping(ui->txtPassword, IDatabase::getInstance().doctorTabModel->fieldIndex("password"));
+    dataMapper->addMapping(ui->txtName, IDatabase::getInstance().doctorTabModel->fieldIndex("name"));
+    dataMapper->addMapping(ui->cbGender, IDatabase::getInstance().doctorTabModel->fieldIndex("gender"));
+    dataMapper->addMapping(ui->spinAge, IDatabase::getInstance().doctorTabModel->fieldIndex("age"));
+    dataMapper->addMapping(ui->txtLicense, IDatabase::getInstance().doctorTabModel->fieldIndex("license_number"));
+
+    dataMapper->setCurrentIndex(index);
+}
+
+DoctorEditView::~DoctorEditView() {
+    delete ui;
+}
+
+void DoctorEditView::on_btnSave_clicked() {
+    // 检查用户名和密码是否为空
+    if (ui->txtUsername->text().isEmpty() || ui->txtPassword->text().isEmpty()) {
+        QMessageBox::warning(this, "错误", "用户名和密码不能为空");
+        return;
+    }
+
+    if (IDatabase::getInstance().submitDoctorEdit()) {
+        QMessageBox::information(this, "成功", "医生信息已保存");
+        emit goPreviousView();
+    } else {
+        QMessageBox::warning(this, "错误", "保存医生信息失败");
+    }
+}
+
+void DoctorEditView::on_btnCancel_clicked() {
+    IDatabase::getInstance().revertDoctorEdit();
+    emit goPreviousView();
+}
+
+
+doctoreditview
+--------------------------------------------------
+#ifndef DOCTOREDITVIEW_H
+#define DOCTOREDITVIEW_H
+
+#include <QWidget>
+#include <QDataWidgetMapper>
+
+namespace Ui {
+class DoctorEditView;
+}
+
+class DoctorEditView : public QWidget
+{
+    Q_OBJECT
+
+public:
+    explicit DoctorEditView(QWidget *parent, int index);
+    ~DoctorEditView();
+
+signals:
+    void goPreviousView();
+
+private slots:
+    void on_btnSave_clicked();
+
+    void on_btnCancel_clicked();
+
+private:
+    Ui::DoctorEditView *ui;
+    QDataWidgetMapper *dataMapper;
+
+
+};
+
+#endif // DOCTOREDITVIEW_H
+
+
+doctoreditview
+--------------------------------------------------
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>DoctorEditView</class>
+ <widget class="QWidget" name="DoctorEditView">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>400</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>编辑医生信息</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QFormLayout" name="formLayout">
+     <item row="0" column="0">
+      <widget class="QLabel" name="labelUsername">
+       <property name="text">
+        <string>用户名：</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLineEdit" name="txtUsername"/>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="labelPassword">
+       <property name="text">
+        <string>密码：</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLineEdit" name="txtPassword">
+       <property name="echoMode">
+        <enum>QLineEdit::EchoMode::Password</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="labelName">
+       <property name="text">
+        <string>姓名：</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QLineEdit" name="txtName"/>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="labelGender">
+       <property name="text">
+        <string>性别：</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="labelAge">
+       <property name="text">
+        <string>年龄：</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="QSpinBox" name="spinAge"/>
+     </item>
+     <item row="5" column="0">
+      <widget class="QLabel" name="labelLicense">
+       <property name="text">
+        <string>执业证书号：</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="1">
+      <widget class="QLineEdit" name="txtLicense"/>
+     </item>
+     <item row="3" column="1">
+      <widget class="QComboBox" name="cbGender">
+       <item>
+        <property name="text">
+         <string>男</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>女</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QPushButton" name="btnSave">
+       <property name="text">
+        <string>保存</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnCancel">
+       <property name="text">
+        <string>取消</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
+
+
 doctorview
 --------------------------------------------------
 #include "doctorview.h"
 #include "ui_doctorview.h"
+#include "idatabase.h"
+#include <QMessageBox>
 
-DoctorView::DoctorView(QWidget *parent)
-    : QWidget(parent)
-    , ui(new Ui::DoctorView)
-{
+DoctorView::DoctorView(QWidget *parent) : QWidget(parent), ui(new Ui::DoctorView) {
     ui->setupUi(this);
+
+    // 初始化医生信息模型
+    if (IDatabase::getInstance().initDoctorModel()) {
+        ui->tableView->setModel(IDatabase::getInstance().doctorTabModel);
+        ui->tableView->setSelectionModel(IDatabase::getInstance().theDoctorSelection);
+    }
+
+    // 设置表格属性
+    ui->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->tableView->setSelectionMode(QAbstractItemView::SingleSelection);
+    ui->tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui->tableView->setAlternatingRowColors(true);
 }
 
 DoctorView::~DoctorView()
 {
     delete ui;
 }
+
+
+
+void DoctorView::on_btnAdd_clicked()
+{
+    int currow = IDatabase::getInstance().addNewDoctor();
+    emit goDoctorEditView(currow);  // 跳转到编辑界面
+}
+
+
+void DoctorView::on_btnEdit_clicked()
+{
+    QModelIndex curIndex = IDatabase::getInstance().theDoctorSelection->currentIndex();
+    emit goDoctorEditView(curIndex.row());  // 跳转到编辑界面
+}
+
+
+void DoctorView::on_btnDelete_clicked()
+{
+    if (IDatabase::getInstance().deleteCurrentDoctor()) {
+        QMessageBox::information(this, "成功", "医生信息已删除");
+    } else {
+        QMessageBox::warning(this, "错误", "删除医生信息失败");
+    }
+}
+
+
+void DoctorView::on_btnSearch_clicked()
+{
+    QString filter = QString("name LIKE '%%1%'").arg(ui->txtSearch->text());
+    if (IDatabase::getInstance().searchDoctor(filter)) {
+        QMessageBox::information(this, "成功", "查询完成");
+    } else {
+        QMessageBox::warning(this, "错误", "查询失败");
+    }
+}
+
+
+
+doctorview
+--------------------------------------------------
+#ifndef DOCTORVIEW_H
+#define DOCTORVIEW_H
+
+#include <QWidget>
+
+namespace Ui {
+class DoctorView;
+}
+
+class DoctorView : public QWidget
+{
+    Q_OBJECT
+
+public:
+    explicit DoctorView(QWidget *parent = nullptr);
+    ~DoctorView();
+
+private:
+    Ui::DoctorView *ui;
+
+public slots:
+private slots:
+    void on_btnAdd_clicked();
+
+    void on_btnEdit_clicked();
+
+    void on_btnDelete_clicked();
+
+    void on_btnSearch_clicked();
+
+signals:
+    void goDoctorEditView(int idx);
+};
+
+#endif // DOCTORVIEW_H
 
 
 doctorview
@@ -160,18 +846,61 @@ doctorview
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>800</width>
+    <height>600</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>医生管理</string>
   </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QLineEdit" name="txtSearch">
+       <property name="placeholderText">
+        <string>请输入姓名进行查找</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnSearch">
+       <property name="text">
+        <string>查找</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnAdd">
+       <property name="text">
+        <string>添加</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnEdit">
+       <property name="text">
+        <string>修改</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnDelete">
+       <property name="text">
+        <string>删除</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QTableView" name="tableView"/>
+   </item>
+  </layout>
  </widget>
  <resources/>
  <connections/>
 </ui>
-
 
 idatabase
 --------------------------------------------------
@@ -186,9 +915,9 @@ void IDatabase::initDatabase()
     database.setDatabaseName(aFile);
 
     if(!database.open()){
-
+        qDebug()<<"数据库异常";
     }else{
-        qDebug()<<"xxx";
+
     }
 }
 
@@ -231,6 +960,28 @@ int IDatabase::addNewPatient()
     return curIndex.row();
 }
 
+QString IDatabase::doctorLogin(const QString &username, const QString &password)
+{
+    QSqlQuery query;
+    query.prepare("SELECT username, password FROM doctor WHERE username = :username");
+    query.bindValue(":username", username);
+    if (!query.exec()) {
+        qDebug() << "Login query failed:" << query.lastError();
+        return "loginFail";
+    }
+
+    if (query.next()) {
+        QString storedPassword = query.value("password").toString();
+        if (storedPassword == password) {
+            return "loginOK";
+        } else {
+            return "wrongPassword";
+        }
+    } else {
+        return "loginFail";
+    }
+}
+
 bool IDatabase::initPatientModel()
 {
     patientTabModel = new QSqlTableModel(this, database);
@@ -257,7 +1008,6 @@ QString IDatabase::userLogin(QString username, QString password)
             return "loginOK";
         }
         else{
-            qDebug()<<"sadasd";
             return "wrongPassword";
         }
     }
@@ -272,12 +1022,215 @@ IDatabase::IDatabase(QObject *parent): QObject{parent}
     initDatabase();
 }
 
+bool IDatabase::initDoctorModel() {
+    doctorTabModel = new QSqlTableModel(this, database);
+    doctorTabModel->setTable("doctor");
+    doctorTabModel->setEditStrategy(QSqlTableModel::OnManualSubmit);
+    doctorTabModel->setSort(doctorTabModel->fieldIndex("name"), Qt::AscendingOrder);
+    if (!doctorTabModel->select()) {
+        qDebug() << "Failed to initialize doctor model:" << doctorTabModel->lastError();
+        return false;
+    }
+
+    theDoctorSelection = new QItemSelectionModel(doctorTabModel);
+    return true;
+}
+
+int IDatabase::addNewDoctor() {
+    doctorTabModel->insertRow(doctorTabModel->rowCount(),QModelIndex());
+    QModelIndex curIndex = doctorTabModel->index(doctorTabModel->rowCount()-1,1);
+    return curIndex.row();
+}
+
+bool IDatabase::deleteCurrentDoctor() {
+    QModelIndex currentIndex = theDoctorSelection->currentIndex();
+    if (!doctorTabModel->removeRow(currentIndex.row())) {
+        qDebug() << "Failed to delete doctor:" << doctorTabModel->lastError();
+        return false;
+    }
+    return doctorTabModel->submitAll();
+}
+
+bool IDatabase::searchDoctor(const QString &filter) {
+    doctorTabModel->setFilter(filter);
+    return doctorTabModel->select();
+}
+
+bool IDatabase::submitDoctorEdit() {
+    return doctorTabModel->submitAll();
+}
+
+void IDatabase::revertDoctorEdit() {
+    doctorTabModel->revertAll();
+}
+
+bool IDatabase::initMedicineModel() {
+    medicineTabModel = new QSqlTableModel(this, database);
+    medicineTabModel->setTable("medicine");
+    medicineTabModel->setEditStrategy(QSqlTableModel::OnManualSubmit);
+    medicineTabModel->setSort(medicineTabModel->fieldIndex("name"), Qt::AscendingOrder);
+    if (!medicineTabModel->select()) {
+        qDebug() << "Failed to initialize medicine model:" << medicineTabModel->lastError();
+        return false;
+    }
+
+    theMedicineSelection = new QItemSelectionModel(medicineTabModel);
+    return true;
+}
+
+int IDatabase::addNewMedicine() {
+    medicineTabModel->insertRow(medicineTabModel->rowCount(),QModelIndex());
+    QModelIndex curIndex = medicineTabModel->index(medicineTabModel->rowCount()-1,1);
+    return curIndex.row();
+}
+
+bool IDatabase::deleteCurrentMedicine() {
+    QModelIndex currentIndex = theMedicineSelection->currentIndex();
+    if (!medicineTabModel->removeRow(currentIndex.row())) {
+        qDebug() << "Failed to delete medicine:" << medicineTabModel->lastError();
+        return false;
+    }
+    return medicineTabModel->submitAll();
+}
+
+bool IDatabase::searchMedicine(const QString &filter) {
+    medicineTabModel->setFilter(filter);
+    return medicineTabModel->select();
+}
+
+bool IDatabase::submitMedicineEdit() {
+    return medicineTabModel->submitAll();
+}
+
+void IDatabase::revertMedicineEdit() {
+    medicineTabModel->revertAll();
+}
+
+bool IDatabase::initAppointmentModel() {
+    appointmentTabModel = new QSqlTableModel(this, database);
+    appointmentTabModel->setTable("appointment");
+    appointmentTabModel->setEditStrategy(QSqlTableModel::OnManualSubmit);
+    appointmentTabModel->setSort(appointmentTabModel->fieldIndex("patient_name"), Qt::AscendingOrder);
+    if (!appointmentTabModel->select()) {
+        qDebug() << "Failed to initialize appointment model:" << appointmentTabModel->lastError();
+        return false;
+    }
+
+    theAppointmentSelection = new QItemSelectionModel(appointmentTabModel);
+    return true;
+}
+
+int IDatabase::addNewAppointment() {
+    appointmentTabModel->insertRow(appointmentTabModel->rowCount(),QModelIndex());
+    QModelIndex curIndex = appointmentTabModel->index(appointmentTabModel->rowCount()-1,1);
+    return curIndex.row();
+}
+
+bool IDatabase::deleteCurrentAppointment() {
+    QModelIndex currentIndex = theAppointmentSelection->currentIndex();
+    if (!appointmentTabModel->removeRow(currentIndex.row())) {
+        qDebug() << "Failed to delete appointment:" << appointmentTabModel->lastError();
+        return false;
+    }
+    return appointmentTabModel->submitAll();
+}
+
+bool IDatabase::searchAppointment(const QString &filter) {
+    appointmentTabModel->setFilter(filter);
+    return appointmentTabModel->select();
+}
+
+bool IDatabase::submitAppointmentEdit() {
+    return appointmentTabModel->submitAll();
+}
+
+void IDatabase::revertAppointmentEdit() {
+    appointmentTabModel->revertAll();
+}
+
+
+idatabase
+--------------------------------------------------
+#ifndef IDATABASE_H
+#define IDATABASE_H
+
+#include <QObject>
+#include <Qtsql>
+#include <QSqlDatabase>
+#include <QDataWidgetMapper>
+
+class IDatabase : public QObject
+{
+    Q_OBJECT
+public:
+    static IDatabase & getInstance()
+    {
+        static IDatabase instance; // Guaranteed to be destroyed.
+            // Instantiated on first use.
+        return instance;
+    }
+
+    QString userLogin(QString username,QString password);
+    bool initPatientModel();
+    QSqlTableModel *patientTabModel;
+    QItemSelectionModel *thePatientSelection;
+    void initDatabase();
+    bool searchPatient(QString filter);
+    bool deleteCurrentPatient();
+    bool submitPatientEdit();
+    void revertPatientEdit();
+    int addNewPatient();
+    QString doctorLogin(const QString &username, const QString &password);
+
+    bool initDoctorModel();  // 初始化医生模型
+    int addNewDoctor();     // 添加新医生
+    bool deleteCurrentDoctor();  // 删除当前医生
+    bool searchDoctor(const QString &filter);  // 查询医生
+    bool submitDoctorEdit();  // 提交医生信息修改
+    void revertDoctorEdit();  // 撤销医生信息修改
+
+    QSqlTableModel *doctorTabModel;  // 医生信息模型
+    QItemSelectionModel *theDoctorSelection;  // 医生选择模型
+
+    bool initMedicineModel();  // 初始化药品模型
+    int addNewMedicine();     // 添加新药品
+    bool deleteCurrentMedicine();  // 删除当前药品
+    bool searchMedicine(const QString &filter);  // 查询药品
+    bool submitMedicineEdit();  // 提交药品信息修改
+    void revertMedicineEdit();  // 撤销药品信息修改
+
+    QSqlTableModel *medicineTabModel;  // 药品信息模型
+    QItemSelectionModel *theMedicineSelection;  // 药品选择模型
+
+    bool initAppointmentModel();  // 初始化就诊记录模型
+    int addNewAppointment();     // 添加新就诊记录
+    bool deleteCurrentAppointment();  // 删除当前就诊记录
+    bool searchAppointment(const QString &filter);  // 查询就诊记录
+    bool submitAppointmentEdit();  // 提交就诊记录修改
+    void revertAppointmentEdit();  // 撤销就诊记录修改
+
+    QSqlTableModel *appointmentTabModel;  // 就诊记录模型
+    QItemSelectionModel *theAppointmentSelection;  // 就诊记录选择模型
+
+private:
+
+    explicit IDatabase(QObject *parent = nullptr);
+    IDatabase(IDatabase const&) = delete;
+    void operator=(IDatabase const&)  = delete;
+
+    QSqlDatabase database;
+signals:
+};
+
+#endif // IDATABASE_H
+
 
 loginview
 --------------------------------------------------
 #include "loginview.h"
 #include "ui_loginview.h"
 #include "idatabase.h"
+#include <QMessageBox>
 
 LoginView::LoginView(QWidget *parent)
     : QWidget(parent)
@@ -293,12 +1246,57 @@ LoginView::~LoginView()
 
 void LoginView::on_btnLogin_clicked()
 {
-    QString status = IDatabase::getInstance().userLogin(ui->inputUsername->text(), ui->inputPassword->text());
+    QString username = ui->inputUsername->text();
+    QString password = ui->inputPassword->text();
+    QString role = ui->comboRole->currentText();
 
-    if(status == "loginOK")
-        emit loginSuccess();
+    QString status;
+    if (role == "医生") {
+        status = IDatabase::getInstance().doctorLogin(username, password);
+    } else {
+        status = IDatabase::getInstance().userLogin(username, password);
+    }
+
+    if (status == "loginOK") {
+        emit loginSuccess(role);  // 传递登录身份
+    } else {
+        QMessageBox::warning(this, "登录失败", "用户名或密码错误");
+    }
 }
 
+
+
+loginview
+--------------------------------------------------
+#ifndef LOGINVIEW_H
+#define LOGINVIEW_H
+
+#include <QWidget>
+
+namespace Ui {
+class LoginView;
+}
+
+class LoginView : public QWidget
+{
+    Q_OBJECT
+
+public:
+    explicit LoginView(QWidget *parent = nullptr);
+    ~LoginView();
+
+private slots:
+    void on_btnLogin_clicked();
+
+signals:
+    void loginSuccess(const QString &role);
+    void loginFailed();
+
+private:
+    Ui::LoginView *ui;
+};
+
+#endif // LOGINVIEW_H
 
 
 loginview
@@ -311,15 +1309,15 @@ loginview
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>407</width>
-    <height>292</height>
+    <width>673</width>
+    <height>395</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>登录</string>
   </property>
-  <layout class="QFormLayout" name="formLayout">
-   <item row="0" column="1">
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
     <spacer name="verticalSpacer_4">
      <property name="orientation">
       <enum>Qt::Orientation::Vertical</enum>
@@ -332,23 +1330,8 @@ loginview
      </property>
     </spacer>
    </item>
-   <item row="1" column="0" colspan="2">
-    <widget class="QLabel" name="label">
-     <property name="font">
-      <font>
-       <pointsize>13</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string>欢迎使用诊疗测试系统</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignmentFlag::AlignCenter</set>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="1">
-    <spacer name="verticalSpacer_3">
+   <item row="8" column="0">
+    <spacer name="verticalSpacer_2">
      <property name="orientation">
       <enum>Qt::Orientation::Vertical</enum>
      </property>
@@ -360,7 +1343,7 @@ loginview
      </property>
     </spacer>
    </item>
-   <item row="3" column="0" colspan="2">
+   <item row="4" column="0">
     <layout class="QHBoxLayout" name="horizontalLayout_4">
      <item>
       <spacer name="horizontalSpacer">
@@ -449,20 +1432,74 @@ loginview
      </item>
     </layout>
    </item>
-   <item row="4" column="1">
-    <spacer name="verticalSpacer">
+   <item row="3" column="0">
+    <layout class="QHBoxLayout" name="horizontalLayout_6">
+     <item>
+      <spacer name="horizontalSpacer_6">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_4">
+       <property name="text">
+        <string>登录身份：</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="comboRole">
+       <item>
+        <property name="text">
+         <string>医生</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>管理员</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_5">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+   <item row="2" column="0">
+    <spacer name="verticalSpacer_3">
      <property name="orientation">
       <enum>Qt::Orientation::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Policy::Fixed</enum>
      </property>
      <property name="sizeHint" stdset="0">
       <size>
        <width>373</width>
-       <height>7</height>
+       <height>37</height>
       </size>
      </property>
     </spacer>
    </item>
-   <item row="5" column="0" colspan="2">
+   <item row="6" column="0">
     <layout class="QHBoxLayout" name="horizontalLayout_5">
      <item>
       <spacer name="horizontalSpacer_3">
@@ -510,15 +1547,33 @@ loginview
      </item>
     </layout>
    </item>
-   <item row="6" column="1">
-    <spacer name="verticalSpacer_2">
+   <item row="1" column="0">
+    <widget class="QLabel" name="label">
+     <property name="font">
+      <font>
+       <pointsize>13</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>欢迎使用诊疗测试系统</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignmentFlag::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0">
+    <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Orientation::Vertical</enum>
      </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Policy::Fixed</enum>
+     </property>
      <property name="sizeHint" stdset="0">
       <size>
-       <width>373</width>
-       <height>37</height>
+       <width>8</width>
+       <height>10</height>
       </size>
      </property>
     </spacer>
@@ -576,25 +1631,32 @@ void MasterView::goLoginView()
     loginView = new LoginView(this);
     pushWidgetToStackView(loginView);
 
-    connect(loginView, SIGNAL(loginSuccess()), this, SLOT(goWelcomeView()));
+    connect(loginView, SIGNAL(loginSuccess(QString)), this, SLOT(goWelcomeView(QString)));
 
 
 }
 
-void MasterView::goWelcomeView()
+void MasterView::goWelcomeView(const QString &role)
 {
     welcomeView = new WelcomeView(this);
     pushWidgetToStackView(welcomeView);
 
-    connect(welcomeView, SIGNAL(goDepartmentView()), this, SLOT(goDepartmentView()));
+    if (role == "医生") {
+        welcomeView->hideAdminButtons();  // 隐藏管理员按钮
+    }
+
+    connect(welcomeView, SIGNAL(goAppointmentView()), this, SLOT(goAppointmentView()));
     connect(welcomeView, SIGNAL(goDoctorView()), this, SLOT(goDoctorView()));
     connect(welcomeView, SIGNAL(goPatientView()), this, SLOT(goPatientView()));
+    connect(welcomeView, SIGNAL(goMedicineView()), this, SLOT(goMedicineView()));
 }
 
 void MasterView::goDoctorView()
 {
     doctorView = new DoctorView(this);
     pushWidgetToStackView(doctorView);
+
+    connect(doctorView, SIGNAL(goDoctorEditView(int)), this, SLOT(goDoctorEditView(int)));
 }
 
 void MasterView::goDepartmentView()
@@ -608,6 +1670,13 @@ void MasterView::goPatientEditView(int rowNo)
     patientEditView = new PatientEditView(this, rowNo);
     pushWidgetToStackView(patientEditView);
     connect(patientEditView,SIGNAL(goPreviousView()),this,SLOT(goPreviousView()));
+}
+
+void MasterView::goDoctorEditView(int rowNo)
+{
+    doctorEditView = new DoctorEditView(this, rowNo);
+    pushWidgetToStackView(doctorEditView);
+    connect(doctorEditView,SIGNAL(goPreviousView()),this,SLOT(goPreviousView()));
 }
 
 void MasterView::goPatientView()
@@ -631,6 +1700,36 @@ void MasterView::goPreviousView()
         ui->stackedWidget->removeWidget(widget);
         delete widget;
     }
+}
+
+void MasterView::goMedicineView()
+{
+    medicineView = new MedicineView(this);
+    pushWidgetToStackView(medicineView);
+
+    connect(medicineView, SIGNAL(goMedicineEditView(int)), this, SLOT(goMedicineEditView(int)));
+}
+
+void MasterView::goMedicineEditView(int rowNo)
+{
+    medicineEditView = new MedicineEditView(this, rowNo);
+    pushWidgetToStackView(medicineEditView);
+    connect(medicineEditView,SIGNAL(goPreviousView()),this,SLOT(goPreviousView()));
+}
+
+void MasterView::goAppointmentView()
+{
+    appointmentView = new AppointmentView(this);
+    pushWidgetToStackView(appointmentView);
+
+    connect(appointmentView, SIGNAL(goAppointmentEditView(int)), this, SLOT(goAppointmentEditView(int)));
+}
+
+void MasterView::goAppointmentEditView(int rowNo)
+{
+    appointmentEditView = new AppointmentEditView(this, rowNo);
+    pushWidgetToStackView(appointmentEditView);
+    connect(appointmentEditView,SIGNAL(goPreviousView()),this,SLOT(goPreviousView()));
 }
 
 void MasterView::pushWidgetToStackView(QWidget *widget)
@@ -681,6 +1780,79 @@ void MasterView::on_btnLogout_clicked()
     goPreviousView();
 }
 
+
+
+masterview
+--------------------------------------------------
+#ifndef MASTERVIEW_H
+#define MASTERVIEW_H
+
+#include <QWidget>
+#include "loginview.h"
+#include "doctorview.h"
+#include "departmentview.h"
+#include "patienteditview.h"
+#include "patientview.h"
+#include "welcomeview.h"
+#include "doctoreditview.h"
+#include "medicineview.h"
+#include "medicineeditview.h"
+#include "appointmentview.h"
+#include "appointmenteditview.h"
+
+QT_BEGIN_NAMESPACE
+namespace Ui {
+class MasterView;
+}
+QT_END_NAMESPACE
+
+class MasterView : public QWidget
+{
+    Q_OBJECT
+
+public:
+    MasterView(QWidget *parent = nullptr);
+    ~MasterView();
+
+public slots:
+    void goLoginView();
+    void goWelcomeView(const QString &role);
+    void goDoctorView();
+    void goDepartmentView();
+    void goPatientEditView(int rowNo);
+    void goDoctorEditView(int rowNo);
+    void goPatientView();
+    void goPreviousView();
+    void goMedicineView();
+    void goMedicineEditView(int rowNo);
+    void goAppointmentView();
+    void goAppointmentEditView(int rowNo);
+
+private slots:
+    void on_btnBack_clicked();
+
+    void on_stackedWidget_currentChanged(int arg1);
+
+    void on_btnLogout_clicked();
+
+private:
+    void pushWidgetToStackView(QWidget *widget);
+
+    Ui::MasterView *ui;
+
+    WelcomeView *welcomeView;
+    DoctorView *doctorView;
+    PatientView *patientView;
+    DepartmentView *departmentView;
+    LoginView *loginView;
+    PatientEditView *patientEditView;
+    DoctorEditView *doctorEditView;
+    MedicineView *medicineView;
+    MedicineEditView *medicineEditView;
+    AppointmentView *appointmentView;
+    AppointmentEditView *appointmentEditView;
+};
+#endif // MASTERVIEW_H
 
 
 masterview
@@ -776,6 +1948,486 @@ masterview
 </ui>
 
 
+medicineeditview
+--------------------------------------------------
+#include "medicineeditview.h"
+#include "ui_medicineeditview.h"
+#include "idatabase.h"
+#include <QSqlTableModel>
+#include <QMessageBox>
+
+MedicineEditView::MedicineEditView(QWidget *parent, int index) : QWidget(parent), ui(new Ui::MedicineEditView) {
+    ui->setupUi(this);
+
+    dataMapper = new QDataWidgetMapper();
+    dataMapper->setModel(IDatabase::getInstance().medicineTabModel);
+    dataMapper->setSubmitPolicy(QDataWidgetMapper::AutoSubmit);
+
+    // 绑定控件到数据库字段
+    dataMapper->addMapping(ui->txtName, IDatabase::getInstance().medicineTabModel->fieldIndex("name"));
+    dataMapper->addMapping(ui->txtDosage, IDatabase::getInstance().medicineTabModel->fieldIndex("dosage"));
+    dataMapper->addMapping(ui->spinStock, IDatabase::getInstance().medicineTabModel->fieldIndex("stock"));
+
+    dataMapper->setCurrentIndex(index);
+}
+
+void MedicineEditView::on_btnSave_clicked() {
+    if (IDatabase::getInstance().submitMedicineEdit()) {
+        QMessageBox::information(this, "成功", "药品信息已保存");
+        emit goPreviousView();
+    } else {
+        QMessageBox::warning(this, "错误", "保存药品信息失败");
+    }
+}
+
+void MedicineEditView::on_btnCancel_clicked() {
+    IDatabase::getInstance().revertMedicineEdit();
+    emit goPreviousView();
+}
+
+MedicineEditView::~MedicineEditView()
+{
+    delete ui;
+}
+
+
+medicineeditview
+--------------------------------------------------
+#ifndef MEDICINEEDITVIEW_H
+#define MEDICINEEDITVIEW_H
+
+#include <QWidget>
+#include <QDataWidgetMapper>
+
+namespace Ui {
+class MedicineEditView;
+}
+
+class MedicineEditView : public QWidget
+{
+    Q_OBJECT
+
+public:
+    explicit MedicineEditView(QWidget *parent, int index);
+    ~MedicineEditView();
+
+private:
+    Ui::MedicineEditView *ui;
+    QDataWidgetMapper *dataMapper;
+
+signals:
+    void goPreviousView();
+private slots:
+    void on_btnSave_clicked();
+    void on_btnCancel_clicked();
+};
+
+#endif // MEDICINEEDITVIEW_H
+
+
+medicineeditview
+--------------------------------------------------
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MedicineEditView</class>
+ <widget class="QWidget" name="MedicineEditView">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>300</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>编辑药品信息</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QFormLayout" name="formLayout">
+     <item row="0" column="0">
+      <widget class="QLabel" name="labelName">
+       <property name="text">
+        <string>药品名称：</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLineEdit" name="txtName"/>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="labelDosage">
+       <property name="text">
+        <string>剂量：</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLineEdit" name="txtDosage"/>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="labelStock">
+       <property name="text">
+        <string>库存数量：</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QSpinBox" name="spinStock"/>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QPushButton" name="btnSave">
+       <property name="text">
+        <string>保存</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnCancel">
+       <property name="text">
+        <string>取消</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
+
+
+medicineview
+--------------------------------------------------
+#include "medicineview.h"
+#include "ui_medicineview.h"
+#include <idatabase.h>
+#include <QMessageBox>
+#include <QFileDialog>
+
+MedicineView::MedicineView(QWidget *parent) : QWidget(parent), ui(new Ui::MedicineView) {
+    ui->setupUi(this);
+
+    // 初始化药品信息模型
+    if (IDatabase::getInstance().initMedicineModel()) {
+        ui->tableView->setModel(IDatabase::getInstance().medicineTabModel);
+        ui->tableView->setSelectionModel(IDatabase::getInstance().theMedicineSelection);
+    }
+
+    // 设置表格属性
+    ui->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->tableView->setSelectionMode(QAbstractItemView::SingleSelection);
+    ui->tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui->tableView->setAlternatingRowColors(true);
+}
+
+MedicineView::~MedicineView()
+{
+    delete ui;
+}
+
+void MedicineView::on_btnAdd_clicked()
+{
+    int currow = IDatabase::getInstance().addNewMedicine();
+    emit goMedicineEditView(currow);  // 跳转到编辑界面
+}
+
+
+
+void MedicineView::on_btnEdit_clicked()
+{
+    QModelIndex curIndex = IDatabase::getInstance().theMedicineSelection->currentIndex();
+    emit goMedicineEditView(curIndex.row());  // 跳转到编辑界面
+}
+
+
+
+void MedicineView::on_btnDelete_clicked()
+{
+    if (IDatabase::getInstance().deleteCurrentMedicine()) {
+        QMessageBox::information(this, "成功", "药品信息已删除");
+    } else {
+        QMessageBox::warning(this, "错误", "删除药品信息失败");
+    }
+}
+
+
+void MedicineView::on_btnSearch_clicked()
+{
+    QString filter = QString("name LIKE '%%1%'").arg(ui->txtSearch->text());
+    if (IDatabase::getInstance().searchMedicine(filter)) {
+        QMessageBox::information(this, "成功", "查询完成");
+    } else {
+        QMessageBox::warning(this, "错误", "查询失败");
+    }
+}
+
+
+void MedicineView::on_btnCheckStock_clicked()
+{
+    QSqlTableModel *model = IDatabase::getInstance().medicineTabModel;
+    bool hasLowStock = false;
+
+    for (int row = 0; row < model->rowCount(); ++row) {
+        int stock = model->data(model->index(row, model->fieldIndex("stock"))).toInt();
+        if (stock < 10) {  // 假设库存低于10时触发警告
+            QString medicineName = model->data(model->index(row, model->fieldIndex("name"))).toString();
+            QMessageBox::warning(this, "库存警告", QString("药品【%1】库存不足，当前库存：%2").arg(medicineName).arg(stock));
+            hasLowStock = true;
+        }
+    }
+
+    if (!hasLowStock) {
+        QMessageBox::information(this, "库存检查", "所有药品库存充足");
+    }
+}
+
+
+void MedicineView::on_btnExport_clicked()
+{
+    // 打开文件对话框，选择保存路径
+    QString fileName = QFileDialog::getSaveFileName(this, "导出药品信息", "药品记录", "CSV文件 (*.csv)");
+    if (fileName.isEmpty()) {
+        return;  // 用户取消导出
+    }
+
+    QFile file(fileName);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QMessageBox::warning(this, "错误", "无法打开文件");
+        return;
+    }
+
+    QTextStream out(&file);
+    out.setEncoding(QStringEncoder::Utf8);  // 指定编码为UTF-8
+    out.setGenerateByteOrderMark(true);  // 添加BOM头
+
+    // 写入表头
+    out << "药品名称,剂量,库存数量\n";
+
+    // 遍历所有药品信息并写入文件
+    QSqlTableModel *model = IDatabase::getInstance().medicineTabModel;
+    for (int row = 0; row < model->rowCount(); ++row) {
+        out << model->data(model->index(row, model->fieldIndex("name"))).toString() << ","
+            << model->data(model->index(row, model->fieldIndex("dosage"))).toString() << ","
+            << model->data(model->index(row, model->fieldIndex("stock"))).toString() << "\n";
+    }
+
+    file.close();
+    QMessageBox::information(this, "成功", "药品信息已导出到：" + fileName);
+}
+
+
+void MedicineView::on_btnImport_clicked() {
+    // 打开文件对话框，选择CSV文件
+    QString fileName = QFileDialog::getOpenFileName(this, "导入药品信息", "", "CSV文件 (*.csv)");
+    if (fileName.isEmpty()) {
+        return;  // 用户取消导入
+    }
+
+    QFile file(fileName);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QMessageBox::warning(this, "错误", "无法打开文件");
+        return;
+    }
+
+    QTextStream in(&file);
+    in.setEncoding(QStringEncoder::Utf8);  // 指定编码为UTF-8
+
+    // 读取表头（跳过第一行）
+    QString header = in.readLine();
+
+    // 逐行读取数据并插入数据库
+    QSqlTableModel *model = IDatabase::getInstance().medicineTabModel;
+    int successCount = 0;  // 成功导入的记录数
+    int updateCount = 0;   // 更新的记录数
+
+    while (!in.atEnd()) {
+        QString line = in.readLine();
+        QStringList fields = line.split(",");
+
+        if (fields.size() < 3) {
+            QMessageBox::warning(this, "错误", "文件格式不正确");
+            return;
+        }
+
+        QString name = fields[0].trimmed();  // 药品名称
+        QString dosage = fields[1].trimmed();  // 剂量
+        int stock = fields[2].trimmed().toInt();  // 库存数量
+
+        // 检查药品是否已存在
+        bool exists = false;
+        for (int row = 0; row < model->rowCount(); ++row) {
+            QString existingName = model->data(model->index(row, model->fieldIndex("name"))).toString();
+            QString existingDosage = model->data(model->index(row, model->fieldIndex("dosage"))).toString();
+
+            if (existingName == name && existingDosage == dosage) {
+                // 药品已存在，更新库存数量
+                int existingStock = model->data(model->index(row, model->fieldIndex("stock"))).toInt();
+                model->setData(model->index(row, model->fieldIndex("stock")), existingStock + stock);
+                exists = true;
+                updateCount++;
+                break;
+            }
+        }
+
+        if (!exists) {
+            // 药品不存在，插入新记录
+            int row = model->rowCount();
+            model->insertRow(row);
+            model->setData(model->index(row, model->fieldIndex("name")), name);
+            model->setData(model->index(row, model->fieldIndex("dosage")), dosage);
+            model->setData(model->index(row, model->fieldIndex("stock")), stock);
+            successCount++;
+        }
+    }
+
+    file.close();
+
+    // 提交修改
+    if (model->submitAll()) {
+        QMessageBox::information(this, "成功", QString("药品信息已导入\n新增记录：%1\n更新记录：%2").arg(successCount).arg(updateCount));
+    } else {
+        QMessageBox::warning(this, "错误", "导入药品信息失败");
+    }
+}
+
+
+medicineview
+--------------------------------------------------
+#ifndef MEDICINEVIEW_H
+#define MEDICINEVIEW_H
+
+#include <QWidget>
+
+namespace Ui {
+class MedicineView;
+}
+
+class MedicineView : public QWidget
+{
+    Q_OBJECT
+
+public:
+    explicit MedicineView(QWidget *parent = nullptr);
+    ~MedicineView();
+
+signals:
+    void goMedicineEditView(int idx);
+
+private slots:
+    void on_btnAdd_clicked();
+
+    void on_btnEdit_clicked();
+
+    void on_btnDelete_clicked();
+
+    void on_btnSearch_clicked();
+
+    void on_btnCheckStock_clicked();
+
+    void on_btnExport_clicked();
+
+    void on_btnImport_clicked();
+
+private:
+    Ui::MedicineView *ui;
+};
+
+#endif // MEDICINEVIEW_H
+
+
+medicineview
+--------------------------------------------------
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MedicineView</class>
+ <widget class="QWidget" name="MedicineView">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>药品管理</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QLineEdit" name="txtSearch">
+       <property name="placeholderText">
+        <string>请输入药品名称进行查找</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnSearch">
+       <property name="text">
+        <string>查找</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnAdd">
+       <property name="text">
+        <string>添加</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnEdit">
+       <property name="text">
+        <string>修改</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnDelete">
+       <property name="text">
+        <string>删除</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnExport">
+       <property name="text">
+        <string>导出</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnCheckStock">
+       <property name="text">
+        <string>检查库存</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnImport">
+       <property name="text">
+        <string>导入</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QTableView" name="tableView"/>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
+
 patienteditview
 --------------------------------------------------
 #include "patienteditview.h"
@@ -828,6 +2480,42 @@ void PatientEditView::on_pushButton_2_clicked()
     emit goPreviousView();
 }
 
+
+
+patienteditview
+--------------------------------------------------
+#ifndef PATIENTEDITVIEW_H
+#define PATIENTEDITVIEW_H
+
+#include <QWidget>
+#include <QDataWidgetMapper>
+
+namespace Ui {
+class PatientEditView;
+}
+
+class PatientEditView : public QWidget
+{
+    Q_OBJECT
+
+public:
+    explicit PatientEditView(QWidget *parent = nullptr, int index = 0);
+    ~PatientEditView();
+
+private slots:
+    void on_pushButton_clicked();
+
+    void on_pushButton_2_clicked();
+
+private:
+    Ui::PatientEditView *ui;
+    QDataWidgetMapper *dataMapper;
+
+signals:
+    void goPreviousView();
+};
+
+#endif // PATIENTEDITVIEW_H
 
 
 patienteditview
@@ -1280,6 +2968,44 @@ void PatientView::on_btnEdit_clicked()
 
 patientview
 --------------------------------------------------
+#ifndef PATIENTVIEW_H
+#define PATIENTVIEW_H
+
+#include <QWidget>
+
+namespace Ui {
+class PatientView;
+}
+
+class PatientView : public QWidget
+{
+    Q_OBJECT
+
+public:
+    explicit PatientView(QWidget *parent = nullptr);
+    ~PatientView();
+
+private slots:
+    void on_btnAdd_clicked();
+
+    void on_btnSearch_clicked();
+
+    void on_addDelete_clicked();
+
+    void on_btnEdit_clicked();
+
+signals:
+    void goPatientEditView(int idx);
+
+private:
+    Ui::PatientView *ui;
+};
+
+#endif // PATIENTVIEW_H
+
+
+patientview
+--------------------------------------------------
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>PatientView</class>
@@ -1376,7 +3102,7 @@ WelcomeView::~WelcomeView()
 
 void WelcomeView::on_btnDepartment_clicked()
 {
-    emit goDepartmentView();
+    //
 }
 
 
@@ -1391,6 +3117,65 @@ void WelcomeView::on_btnPatient_clicked()
     emit goPatientView();
 }
 
+void WelcomeView::hideAdminButtons() {
+    ui->btnDoctor->setVisible(false);
+}
+
+void WelcomeView::on_btnMedicine_clicked()
+{
+    emit goMedicineView();
+}
+
+
+void WelcomeView::on_btnAppointment_clicked()
+{
+    emit goAppointmentView();
+}
+
+
+
+welcomeview
+--------------------------------------------------
+#ifndef WELCOMEVIEW_H
+#define WELCOMEVIEW_H
+
+#include <QWidget>
+
+namespace Ui {
+class WelcomeView;
+}
+
+class WelcomeView : public QWidget
+{
+    Q_OBJECT
+
+public:
+    explicit WelcomeView(QWidget *parent = nullptr);
+    ~WelcomeView();
+    void hideAdminButtons();
+
+private slots:
+    void on_btnDepartment_clicked();
+
+    void on_btnDoctor_clicked();
+
+    void on_btnPatient_clicked();
+
+    void on_btnMedicine_clicked();
+
+    void on_btnAppointment_clicked();
+
+signals:
+    void goAppointmentView();
+    void goDoctorView();
+    void goPatientView();
+    void goMedicineView();
+
+private:
+    Ui::WelcomeView *ui;
+};
+
+#endif // WELCOMEVIEW_H
 
 
 welcomeview
@@ -1440,7 +3225,7 @@ welcomeview
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="btnDepartment">
+      <widget class="QPushButton" name="btnAppointment">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -1454,7 +3239,7 @@ welcomeview
         </size>
        </property>
        <property name="text">
-        <string>科室管理</string>
+        <string>就诊管理</string>
        </property>
       </widget>
      </item>
@@ -1524,6 +3309,32 @@ welcomeview
      </item>
      <item>
       <spacer name="horizontalSpacer_4">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnMedicine">
+       <property name="minimumSize">
+        <size>
+         <width>80</width>
+         <height>80</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>药物管理</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_5">
        <property name="orientation">
         <enum>Qt::Orientation::Horizontal</enum>
        </property>

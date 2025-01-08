@@ -24,6 +24,10 @@ private slots:
 
     void on_btnEdit_clicked();
 
+    void on_btnExport_clicked();
+
+    void on_btnImport_clicked();
+
 signals:
     void goPatientEditView(int idx);
 
