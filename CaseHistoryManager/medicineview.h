@@ -31,6 +31,8 @@ private slots:
 
     void on_btnExport_clicked();
 
+    void on_btnImport_clicked();
+
 private:
     Ui::MedicineView *ui;
 };

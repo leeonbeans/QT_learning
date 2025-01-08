@@ -115,3 +115,77 @@ void MedicineView::on_btnExport_clicked()
     QMessageBox::information(this, "成功", "药品信息已导出到：" + fileName);
 }
 
+
+void MedicineView::on_btnImport_clicked() {
+    // 打开文件对话框，选择CSV文件
+    QString fileName = QFileDialog::getOpenFileName(this, "导入药品信息", "", "CSV文件 (*.csv)");
+    if (fileName.isEmpty()) {
+        return;  // 用户取消导入
+    }
+
+    QFile file(fileName);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QMessageBox::warning(this, "错误", "无法打开文件");
+        return;
+    }
+
+    QTextStream in(&file);
+    in.setEncoding(QStringEncoder::Utf8);  // 指定编码为UTF-8
+
+    // 读取表头（跳过第一行）
+    QString header = in.readLine();
+
+    // 逐行读取数据并插入数据库
+    QSqlTableModel *model = IDatabase::getInstance().medicineTabModel;
+    int successCount = 0;  // 成功导入的记录数
+    int updateCount = 0;   // 更新的记录数
+
+    while (!in.atEnd()) {
+        QString line = in.readLine();
+        QStringList fields = line.split(",");
+
+        if (fields.size() < 3) {
+            QMessageBox::warning(this, "错误", "文件格式不正确");
+            return;
+        }
+
+        QString name = fields[0].trimmed();  // 药品名称
+        QString dosage = fields[1].trimmed();  // 剂量
+        int stock = fields[2].trimmed().toInt();  // 库存数量
+
+        // 检查药品是否已存在
+        bool exists = false;
+        for (int row = 0; row < model->rowCount(); ++row) {
+            QString existingName = model->data(model->index(row, model->fieldIndex("name"))).toString();
+            QString existingDosage = model->data(model->index(row, model->fieldIndex("dosage"))).toString();
+
+            if (existingName == name && existingDosage == dosage) {
+                // 药品已存在，更新库存数量
+                int existingStock = model->data(model->index(row, model->fieldIndex("stock"))).toInt();
+                model->setData(model->index(row, model->fieldIndex("stock")), existingStock + stock);
+                exists = true;
+                updateCount++;
+                break;
+            }
+        }
+
+        if (!exists) {
+            // 药品不存在，插入新记录
+            int row = model->rowCount();
+            model->insertRow(row);
+            model->setData(model->index(row, model->fieldIndex("name")), name);
+            model->setData(model->index(row, model->fieldIndex("dosage")), dosage);
+            model->setData(model->index(row, model->fieldIndex("stock")), stock);
+            successCount++;
+        }
+    }
+
+    file.close();
+
+    // 提交修改
+    if (model->submitAll()) {
+        QMessageBox::information(this, "成功", QString("药品信息已导入\n新增记录：%1\n更新记录：%2").arg(successCount).arg(updateCount));
+    } else {
+        QMessageBox::warning(this, "错误", "导入药品信息失败");
+    }
+}
