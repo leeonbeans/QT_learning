@@ -5,7 +5,7 @@ void IDatabase::initDatabase()
 {
 
     database = QSqlDatabase::addDatabase("QSQLITE");
-    QString aFile = "C:/Users/weii/Documents/Navicat/Premium/profiles/Lab4.db";
+    QString aFile = "../../Lab4.db";
     database.setDatabaseName(aFile);
 
     if(!database.open()){
